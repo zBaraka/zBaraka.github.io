@@ -459,8 +459,8 @@
       }
 
       .playback-controls {
-        margin-bottom: 0.5rem;
-      }
+          margin-bottom: 0.5rem;
+        }
 
       .progress-container {
         margin: 0;
@@ -473,6 +473,34 @@
         display: none;
       }
     }
+      /* Styles for mobile UI  (with progress bar visible) */
+      @media (max-width: 768px) {
+        #now-playing {
+          flex-direction: column;
+          align-items: center;
+          padding: 1rem;
+          height: auto;
+        }
+
+        .now-playing-info {
+          display: none; /* Hide title and thumbnail on mobile */
+        }
+
+         .playback-controls {
+          margin-bottom: 0.5rem;
+        }
+
+        .progress-container {
+          margin: 0;
+           width: 100%;
+        }
+
+        .volume-control,
+        .toggle-button,
+        .shuffle-button {
+          display: none;
+        }
+      }
   </style>
 </head>
 <body data-theme="dark">
@@ -493,6 +521,13 @@
       <div class="now-playing-thumbnail" id="now-playing-thumbnail"></div>
       <span class="now-playing-title" id="current-song">Nothing playing</span>
     </div>
+        <div class="progress-container">
+      <div class="progress-bar" id="progress-bar" aria-label="Progress Bar">
+        <div class="progress-filled" id="progress-filled"></div>
+        <div class="progress-handle" id="progress-handle"></div>
+      </div>
+      <div class="time-display" id="time-display">0:00 / 0:00</div>
+    </div>
     <div class="playback-controls">
       <button class="control-button" id="prev-track" aria-label="Previous Track">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6,18V6H8V18H6M9.5,12L18,6V18L9.5,12Z"/></svg>
@@ -505,13 +540,6 @@
       <button class="control-button" id="next-track" aria-label="Next Track">
         <svg viewBox="0.0 0 24 24"><path fill="currentColor" d="M16,18H18V6H16M6,18L14.5,12L6,6V18Z"/></svg>
       </button>
-    </div>
-    <div class="progress-container">
-      <div class="progress-bar" id="progress-bar" aria-label="Progress Bar">
-        <div class="progress-filled" id="progress-filled"></div>
-        <div class="progress-handle" id="progress-handle"></div>
-      </div>
-      <div class="time-display" id="time-display">0:00 / 0:00</div>
     </div>
     <div class="volume-control">
       <button class="control-button" id="volume-button" aria-label="Toggle Volume">
@@ -758,17 +786,6 @@
       document.addEventListener('touchmove', onDragTouch);
       document.addEventListener('touchend', stopDrag);
     });
-
-    function onDrag(e) {
-            if (currentAudio && isDragging) {
-        const rect = progressBar.getBoundingClientRect();
-        let pos = (e.clientX - rect.left) / rect.width;
-        pos = Math.max(0, Math.min(1, pos));
-        progressFilled.style.width = `${pos * 100}%`;
-        progressHandle.style.left = `${pos * 100}%`;
-        currentAudio.currentTime = pos * currentAudio.duration;
-      }
-    }
 
     function onDragTouch(e) {
       if (currentAudio && isDragging) {
@@ -1065,3 +1082,5 @@
   </script>
 </body>
 </html>
+
+    
