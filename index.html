@@ -440,6 +440,39 @@
         opacity: 1;
       }
     }
+
+    /* Styles for mobile UI */
+    @media (max-width: 768px) {
+      .logo {
+        display: none;
+      }
+
+      #now-playing {
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        height: auto;
+      }
+
+      .now-playing-info {
+        display: none;
+      }
+
+      .playback-controls {
+        margin-bottom: 0.5rem;
+      }
+
+      .progress-container {
+        margin: 0;
+        width: 100%;
+      }
+
+      .volume-control,
+      .toggle-button,
+      .shuffle-button {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body data-theme="dark">
@@ -470,7 +503,7 @@
         </svg>
       </button>
       <button class="control-button" id="next-track" aria-label="Next Track">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M16,18H18V6H16M6,18L14.5,12L6,6V18Z"/></svg>
+        <svg viewBox="0.0 0 24 24"><path fill="currentColor" d="M16,18H18V6H16M6,18L14.5,12L6,6V18Z"/></svg>
       </button>
     </div>
     <div class="progress-container">
@@ -626,7 +659,7 @@
       if (isPlaying) {
         playIcon.innerHTML = '<path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z"/>';
       } else {
-        playIcon.innerHTML = '<path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/>';
+        playIcon.innerHTML = '<path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>';
       }
     }
 
@@ -727,7 +760,7 @@
     });
 
     function onDrag(e) {
-      if (currentAudio && isDragging) {
+            if (currentAudio && isDragging) {
         const rect = progressBar.getBoundingClientRect();
         let pos = (e.clientX - rect.left) / rect.width;
         pos = Math.max(0, Math.min(1, pos));
