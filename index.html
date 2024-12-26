@@ -889,22 +889,29 @@
       }
     }
 
+    searchInput.addEventListener('input', (e) => {
+      filterSongs(e.target.value);
+    });
+
     function filterSongs(searchTerm) {
       const normalizedSearch = searchTerm.toLowerCase();
       let hasResults = false;
+      
       allMusicCards.forEach(card => {
         const songTitle = card.querySelector('.song-title').textContent.toLowerCase();
         if (songTitle.includes(normalizedSearch)) {
-          card.style.display = '';
+          card.style.display = 'block';
           hasResults = true;
         } else {
           card.style.display = 'none';
         }
       });
+
       const existingNoResults = musicGrid.querySelector('.no-results');
       if (existingNoResults) {
         existingNoResults.remove();
       }
+
       if (!hasResults && searchTerm) {
         const noResults = document.createElement('div');
         noResults.className = 'no-results';
@@ -1199,7 +1206,7 @@
         path: 'https://ia803105.us.archive.org/17/items/rdhjrdhdrijhrh/Disstrack%20gegen%20Besgen.mp3',
       }, {
         title: 'Dual Shadows',
-        thumbnail: 'https://i.imgur.com/MVqqDkZ.png',
+        thumbnail: 'https://i.imgur.com/MVqqDKZ.png',
         path: 'https://cdn1.suno.ai/9c815206-e964-4b4b-90bf-b832d42278de.mp3',
       }, {
         title: 'Eclipsed Horizions',
