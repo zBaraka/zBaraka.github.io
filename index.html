@@ -1,8 +1,7 @@
 <html><head><base href="https://example.com/">
   <meta charset="UTF-8">
   <title>Modern Music Player</title>
-  <link rel="icon" href="https://i.imgur.com/xCFfLev.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
   <style>
     :root {
       --primary-color: #6200ea;
@@ -19,6 +18,20 @@
       --play-button-shadow: rgba(0, 0, 0, 0.7);
       --progress-bar-color: #444;
       --progress-handle-color: #777;
+    }
+
+    :root[data-theme="light"] {
+      --primary-color: #6200ea;
+      --secondary-color: #03dac6;
+      --background-color: #f5f5f5;
+      --card-background: #ffffff;
+      --text-color: #121212;
+      --accent-color: #bb86fc;
+      --shadow-color: rgba(0, 0, 0, 0.2);
+      --play-button-color: #121212;
+      --play-button-shadow: rgba(0, 0, 0, 0.2);
+      --progress-bar-color: #ddd;
+      --progress-handle-color: #666;
     }
 
     * {
@@ -281,10 +294,18 @@
     }
 
     .shuffle-button {
-      color: var(--primary-color);
+      color: var(--text-color);
     }
 
     .shuffle-button.active {
+      color: var(--accent-color);
+    }
+
+    :root[data-theme="light"] .shuffle-button {
+      color: #ffffff;
+    }
+
+    :root[data-theme="light"] .shuffle-button.active {
       color: var(--accent-color);
     }
 
@@ -403,6 +424,206 @@
       font-size: 1.2rem;
     }
 
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--text-color);
+      cursor: pointer;
+      padding: 0.7rem;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 8px var(--shadow-color);
+    }
+
+    .theme-toggle svg {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .theme-toggle:hover svg {
+      transform: rotate(45deg);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+        padding-bottom: var(--now-playing-height);
+      }
+
+      .logo {
+        width: 120px;
+        top: 0.5rem;
+        left: 0.5rem;
+      }
+
+      .search-container {
+        margin: 3rem auto 1rem;
+        max-width: 100%;
+        padding: 0;
+      }
+
+      .music-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 1rem;
+      }
+
+      .play-icon {
+        width: 50px;
+        height: 50px;
+      }
+
+      .song-info {
+        padding: 1rem;
+      }
+
+      #now-playing {
+        padding: 0.8rem 1rem;
+        gap: 0.5rem;
+      }
+
+      .now-playing-thumbnail {
+        width: 50px;
+        height: 50px;
+      }
+
+      .now-playing-info {
+        min-width: auto;
+        max-width: none;
+        gap: 0.8rem;
+      }
+
+      .now-playing-title {
+        display: none;
+      }
+
+      .playback-controls {
+        gap: 0.8rem;
+      }
+
+      .control-button svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .progress-container {
+        flex: 1;
+        margin: 0;
+      }
+
+      .volume-control {
+        display: none;
+      }
+
+      .theme-toggle {
+        width: 40px;
+        height: 40px;
+        top: 0.5rem;
+        right: 0.5rem;
+      }
+
+      .toggle-button {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.8rem;
+      }
+
+      .time-display {
+        font-size: 0.9rem;
+        min-width: 90px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .music-grid {
+        padding: 0.8rem;
+        gap: 1rem;
+      }
+
+      .play-icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      .song-info {
+        padding: 0.8rem;
+      }
+
+      #now-playing {
+        padding: 0.6rem 0.8rem;
+        gap: 0.3rem;
+      }
+
+      .now-playing-thumbnail {
+        width: 40px;
+        height: 40px;
+      }
+
+      .playback-controls {
+        gap: 0.5rem;
+      }
+
+      .control-button svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .time-display {
+        font-size: 0.8rem;
+        min-width: 70px;
+      }
+
+      .toggle-button {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
+      }
+    }
+
+    @media (max-width: 768px) and (orientation: portrait) {
+      #now-playing {
+        display: flex;
+      }
+
+      body {
+        padding-bottom: var(--now-playing-height);
+      }
+    }
+
+    @media (max-width: 768px) and (orientation: landscape) {
+      #now-playing {
+        display: none;
+      }
+
+      body {
+        padding-bottom: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) and (orientation: portrait) {
+      #now-playing {
+        display: flex;
+      }
+
+      body {
+        padding-bottom: var(--now-playing-height);
+      }
+    }
+
+    @media (max-width: 480px) and (orientation: landscape) {
+      #now-playing {
+        display: none;
+      }
+
+      body {
+        padding-bottom: 0.8rem;
+      }
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -442,7 +663,7 @@
     }
   </style>
 </head>
-<body data-theme="dark">
+<body>
   <div class="logo">
     <img src="https://i.imgur.com/xCFfLev.png" alt="SkyBrute Logo" id="logo-image">
   </div>
@@ -450,6 +671,11 @@
     <div class="search-container">
       <input type="text" class="search-input" placeholder="Search songs..." id="search-input" aria-label="Search songs">
     </div>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path fill="currentColor" d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M3,9V15H7L12,20V4L7,9H3Z"/>
+      </svg>
+    </button>
     <div class="music-grid" id="music-grid">
       <!-- Music cards will be dynamically inserted here -->
     </div>
@@ -502,6 +728,38 @@
   </div>
 
   <script>
+    function initTheme() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      updateThemeIcon(theme);
+    }
+
+    function updateThemeIcon(theme) {
+      const themeToggle = document.getElementById('theme-toggle');
+      const logoImage = document.getElementById('logo-image');
+      const shuffleButton = document.getElementById('shuffle-button');
+      let themeIcon = '';
+      let logoSrc = '';
+      let shuffleColor = '';
+      if (theme === 'light') {
+        themeIcon = `<svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor" d="M20 12l-1.41-1.41-3.54 3.54-1.41 1.41 4.55 0z"/>
+              <path fill="currentColor" d="M12 20l-4.55 0-1.41-1.41 3.54-3.54 1.41-1.41z"/>
+            </svg>`;
+        logoSrc = 'https://i.imgur.com/ZaT26d8.png';
+        shuffleColor = 'var(--accent-color)';
+      } else {
+        themeIcon = `<svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor" d="M12 2c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm0 12c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+            </svg>`;
+        logoSrc = 'https://i.imgur.com/xCFfLev.png';
+        shuffleColor = 'var(--primary-color)';
+      }
+      themeToggle.innerHTML = themeIcon;
+      logoImage.src = logoSrc;
+      shuffleButton.style.color = shuffleColor;
+    }
+
     const musicGrid = document.getElementById('music-grid');
     const nowPlaying = document.getElementById('now-playing');
     const progressFilled = document.getElementById('progress-filled');
@@ -701,7 +959,7 @@
       if (shuffleEnabled) {
         shuffleButton.style.color = 'var(--accent-color)';
       } else {
-        shuffleButton.style.color = 'var(--primary-color)';
+        shuffleButton.style.color = '#ffffff';
       }
       localStorage.setItem('shuffleEnabled', shuffleEnabled);
     });
@@ -770,7 +1028,7 @@
             currentAudio.currentTime = Math.min(currentAudio.duration, currentAudio.currentTime + 10);
           }
           break;
-                case 'ArrowLeft':
+        case 'ArrowLeft':
           if (currentAudio) {
             currentAudio.currentTime = Math.max(0, currentAudio.currentTime - 10);
           }
@@ -813,6 +1071,14 @@
     document.addEventListener('keydown', handleKeyboardShortcuts);
 
     document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      document.getElementById('theme-toggle').addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+      });
       initializeMusicPlayer();
       updateVolumeIcon(volumeSlider.value);
     });
@@ -837,7 +1103,7 @@
         if (shuffleEnabled) {
           shuffleButton.style.color = 'var(--accent-color)';
         } else {
-          shuffleButton.style.color = 'var(--primary-color)';
+          shuffleButton.style.color = '#ffffff';
         }
       }
       scanForMusicFiles().then(availableFiles => {
