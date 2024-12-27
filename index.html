@@ -701,7 +701,7 @@
       </button>
     </div>
     <div class="progress-container">
-      <div class="progress-bar" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="progress-bar" id="progress-bar" aria-label="Progress Bar">
         <div class="progress-filled" id="progress-filled"></div>
         <div class="progress-handle" id="progress-handle"></div>
       </div>
@@ -964,7 +964,11 @@
     shuffleButton.addEventListener('click', () => {
       shuffleEnabled = !shuffleEnabled;
       shuffleButton.classList.toggle('active', shuffleEnabled);
-      shuffleButton.style.color = shuffleEnabled ? 'var(--accent-color)' : '#ffffff';
+      if (shuffleEnabled) {
+        shuffleButton.style.color = 'var(--accent-color)';
+      } else {
+        shuffleButton.style.color = '#ffffff';
+      }
       localStorage.setItem('shuffleEnabled', shuffleEnabled);
     });
 
@@ -1084,6 +1088,7 @@
         updateThemeIcon(newTheme);
       });
       initializeMusicPlayer();
+      updateVolumeIcon(volumeSlider.value);
     });
 
     document.addEventListener('visibilitychange', () => {
@@ -1103,7 +1108,11 @@
       if (savedShuffle !== null) {
         shuffleEnabled = savedShuffle === 'true';
         shuffleButton.classList.toggle('active', shuffleEnabled);
-        shuffleButton.style.color = shuffleEnabled ? 'var(--accent-color)' : '#ffffff';
+        if (shuffleEnabled) {
+          shuffleButton.style.color = 'var(--accent-color)';
+        } else {
+          shuffleButton.style.color = '#ffffff';
+        }
       }
       scanForMusicFiles().then(availableFiles => {
         tracks = availableFiles;
@@ -1114,6 +1123,45 @@
         });
       });
     }
+
+    function updateVolumeIcon(volume) {
+      let path = '';
+      if (volume > 0.5) {
+        path = '<path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/>';
+      } else if (volume > 0) {
+        path = '<path fill="currentColor" d="M5,9V15H9L14,20V4L9,9M18.5,12C18.5,10.23 17.5,8.71 16,7.97V16C17.5,15.29 18.5,13.76 18.5,12Z"/>';
+      } else {
+        path = '<path fill="currentColor" d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12Z"/>';
+      }
+      volumeButton.innerHTML = `<svg viewBox="0 0 24 24">${path}</svg>`;
+    }
+
+    volumeSlider.addEventListener('input', e => {
+      if (currentAudio) {
+        currentAudio.volume = e.target.value;
+        lastVolume = e.target.value;
+        updateVolumeIcon(e.target.value);
+      }
+    });
+
+    volumeButton.addEventListener('click', () => {
+      if (currentAudio) {
+        if (currentAudio.volume > 0) {
+          currentAudio.volume = 0;
+          volumeSlider.value = 0;
+        } else {
+          currentAudio.volume = lastVolume;
+          volumeSlider.value = lastVolume;
+        }
+        updateVolumeIcon(currentAudio.volume);
+      }
+    });
+
+    autoplayToggle.addEventListener('click', () => {
+      autoplayEnabled = !autoplayEnabled;
+      autoplayToggle.classList.toggle('active', autoplayEnabled);
+      localStorage.setItem('autoplayEnabled', autoplayEnabled);
+    });
 
     function scanForMusicFiles() {
       const songList = [{
