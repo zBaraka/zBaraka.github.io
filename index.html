@@ -55,10 +55,11 @@
       max-width: 1200px;
       margin: 0 auto;
       margin-bottom: 4rem;
+      position: relative;
     }
 
     .logo {
-      position: fixed;
+      position: absolute;
       top: 1rem;
       left: 1rem;
       width: 150px;
@@ -470,7 +471,7 @@
       }
 
       .music-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 1.5rem;
         padding: 1rem;
       }
@@ -487,17 +488,15 @@
       #now-playing {
         padding: 0.8rem 1rem;
         gap: 0.5rem;
-      }
-
-      .now-playing-thumbnail {
-        width: 50px;
-        height: 50px;
+        flex-wrap: wrap;
+        height: auto;
       }
 
       .now-playing-info {
         min-width: auto;
         max-width: none;
         gap: 0.8rem;
+        flex-basis: 100%;
       }
 
       .now-playing-title {
@@ -514,7 +513,7 @@
       }
 
       .progress-container {
-        flex: 1;
+        flex-basis: 100%;
         margin: 0;
       }
 
@@ -665,10 +664,10 @@
   </style>
 </head>
 <body>
-  <div class="logo">
-    <img src="https://i.imgur.com/xCFfLev.png" alt="SkyBrute Logo" id="logo-image">
-  </div>
   <div class="container">
+    <div class="logo">
+      <img src="https://i.imgur.com/xCFfLev.png" alt="SkyBrute Logo" id="logo-image">
+    </div>
     <div class="search-container">
       <input type="text" class="search-input" placeholder="Search songs..." id="search-input" aria-label="Search songs">
     </div>
@@ -685,7 +684,6 @@
   <div id="now-playing">
     <div class="now-playing-info">
       <div class="now-playing-thumbnail" id="now-playing-thumbnail"></div>
-      <span class="now-playing-title" id="current-song">Nothing playing</span>
     </div>
     <div class="playback-controls">
       <button class="control-button" id="prev-track" aria-label="Previous Track">
@@ -800,7 +798,6 @@
     }
 
     function updateNowPlayingInfo(title, thumbnailSrc) {
-      currentSongDisplay.textContent = title;
       const thumbnailContainer = document.getElementById('now-playing-thumbnail');
       thumbnailContainer.innerHTML = thumbnailSrc ? `<img src="${thumbnailSrc}" alt="${title}">` : `<svg viewBox="0 0 24 24">
                <path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
