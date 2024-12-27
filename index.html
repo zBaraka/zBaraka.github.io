@@ -2,7 +2,7 @@
 <link rel="icon" href="https://i.imgur.com/xCFfLev.png">
   <meta charset="UTF-8">
   <title>Skybrute</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary-color: #6200ea;
@@ -202,7 +202,7 @@
       right: 0;
       background: var(--card-background);
       padding: 1rem 2rem;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: space-between;
       gap: 1.5rem;
@@ -827,7 +827,7 @@
       card.innerHTML = `
             ${thumbnailHtml}
             <div class="song-info">
-              <div class="song-title">${song.title}</div>
+                            <div class="song-title">${song.title}</div>
               <audio class="audio-control" src="${song.path}" preload="auto"></audio>
             </div>
           `;
@@ -893,7 +893,7 @@
     function filterSongs(searchTerm) {
       const normalizedSearch = searchTerm.toLowerCase();
       let hasResults = false;
-      
+
       allMusicCards.forEach(card => {
         const songTitle = card.querySelector('.song-title').textContent.toLowerCase();
         if (songTitle.includes(normalizedSearch)) {
@@ -1086,6 +1086,21 @@
       });
       initializeMusicPlayer();
       updateVolumeIcon(volumeSlider.value);
+
+      // Überprüfe beim Laden, ob ein Song abgespielt wird und das Gerät im Hochformat ist
+      if (window.innerWidth < 768 && Math.abs(window.orientation) === 0 && currentAudio && !currentAudio.paused) {
+        nowPlaying.style.display = 'flex';
+      }
+    });
+
+    window.addEventListener('orientationchange', () => {
+      if (window.innerWidth < 768 && Math.abs(window.orientation) === 0) {
+        if (currentAudio && !currentAudio.paused) {
+          nowPlaying.style.display = 'flex';
+        }
+      } else if (window.innerWidth < 768) {
+        nowPlaying.style.display = 'none';
+      }
     });
 
     document.addEventListener('visibilitychange', () => {
