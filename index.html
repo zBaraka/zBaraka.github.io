@@ -2,7 +2,7 @@
 <link rel="icon" href="https://i.imgur.com/xCFfLev.png">
   <meta charset="UTF-8">
   <title>Skybrute</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
   <style>
     :root {
       --primary-color: #6200ea;
@@ -55,11 +55,10 @@
       max-width: 1200px;
       margin: 0 auto;
       margin-bottom: 4rem;
-      position: relative;
     }
 
     .logo {
-      position: absolute;
+      position: fixed;
       top: 1rem;
       left: 1rem;
       width: 150px;
@@ -202,7 +201,7 @@
       right: 0;
       background: var(--card-background);
       padding: 1rem 2rem;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1.5rem;
@@ -471,7 +470,7 @@
       }
 
       .music-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: 1fr;
         gap: 1.5rem;
         padding: 1rem;
       }
@@ -488,15 +487,17 @@
       #now-playing {
         padding: 0.8rem 1rem;
         gap: 0.5rem;
-        flex-wrap: wrap;
-        height: auto;
+      }
+
+      .now-playing-thumbnail {
+        width: 50px;
+        height: 50px;
       }
 
       .now-playing-info {
         min-width: auto;
         max-width: none;
         gap: 0.8rem;
-        flex-basis: 100%;
       }
 
       .now-playing-title {
@@ -513,7 +514,7 @@
       }
 
       .progress-container {
-        flex-basis: 100%;
+        flex: 1;
         margin: 0;
       }
 
@@ -664,10 +665,10 @@
   </style>
 </head>
 <body>
+  <div class="logo">
+    <img src="https://i.imgur.com/xCFfLev.png" alt="SkyBrute Logo" id="logo-image">
+  </div>
   <div class="container">
-    <div class="logo">
-      <img src="https://i.imgur.com/xCFfLev.png" alt="SkyBrute Logo" id="logo-image">
-    </div>
     <div class="search-container">
       <input type="text" class="search-input" placeholder="Search songs..." id="search-input" aria-label="Search songs">
     </div>
@@ -684,6 +685,7 @@
   <div id="now-playing">
     <div class="now-playing-info">
       <div class="now-playing-thumbnail" id="now-playing-thumbnail"></div>
+      <span class="now-playing-title" id="current-song">Nothing playing</span>
     </div>
     <div class="playback-controls">
       <button class="control-button" id="prev-track" aria-label="Previous Track">
@@ -699,7 +701,7 @@
       </button>
     </div>
     <div class="progress-container">
-      <div class="progress-bar" id="progress-bar" aria-label="Progress Bar">
+      <div class="progress-bar" id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="progress-filled" id="progress-filled"></div>
         <div class="progress-handle" id="progress-handle"></div>
       </div>
@@ -798,6 +800,7 @@
     }
 
     function updateNowPlayingInfo(title, thumbnailSrc) {
+      currentSongDisplay.textContent = title;
       const thumbnailContainer = document.getElementById('now-playing-thumbnail');
       thumbnailContainer.innerHTML = thumbnailSrc ? `<img src="${thumbnailSrc}" alt="${title}">` : `<svg viewBox="0 0 24 24">
                <path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
@@ -827,7 +830,7 @@
       card.innerHTML = `
             ${thumbnailHtml}
             <div class="song-info">
-                            <div class="song-title">${song.title}</div>
+              <div class="song-title">${song.title}</div>
               <audio class="audio-control" src="${song.path}" preload="auto"></audio>
             </div>
           `;
@@ -893,7 +896,7 @@
     function filterSongs(searchTerm) {
       const normalizedSearch = searchTerm.toLowerCase();
       let hasResults = false;
-
+      
       allMusicCards.forEach(card => {
         const songTitle = card.querySelector('.song-title').textContent.toLowerCase();
         if (songTitle.includes(normalizedSearch)) {
@@ -961,11 +964,7 @@
     shuffleButton.addEventListener('click', () => {
       shuffleEnabled = !shuffleEnabled;
       shuffleButton.classList.toggle('active', shuffleEnabled);
-      if (shuffleEnabled) {
-        shuffleButton.style.color = 'var(--accent-color)';
-      } else {
-        shuffleButton.style.color = '#ffffff';
-      }
+      shuffleButton.style.color = shuffleEnabled ? 'var(--accent-color)' : '#ffffff';
       localStorage.setItem('shuffleEnabled', shuffleEnabled);
     });
 
@@ -1085,22 +1084,6 @@
         updateThemeIcon(newTheme);
       });
       initializeMusicPlayer();
-      updateVolumeIcon(volumeSlider.value);
-
-      // Überprüfe beim Laden, ob ein Song abgespielt wird und das Gerät im Hochformat ist
-      if (window.innerWidth < 768 && Math.abs(window.orientation) === 0 && currentAudio && !currentAudio.paused) {
-        nowPlaying.style.display = 'flex';
-      }
-    });
-
-    window.addEventListener('orientationchange', () => {
-      if (window.innerWidth < 768 && Math.abs(window.orientation) === 0) {
-        if (currentAudio && !currentAudio.paused) {
-          nowPlaying.style.display = 'flex';
-        }
-      } else if (window.innerWidth < 768) {
-        nowPlaying.style.display = 'none';
-      }
     });
 
     document.addEventListener('visibilitychange', () => {
@@ -1120,11 +1103,7 @@
       if (savedShuffle !== null) {
         shuffleEnabled = savedShuffle === 'true';
         shuffleButton.classList.toggle('active', shuffleEnabled);
-        if (shuffleEnabled) {
-          shuffleButton.style.color = 'var(--accent-color)';
-        } else {
-          shuffleButton.style.color = '#ffffff';
-        }
+        shuffleButton.style.color = shuffleEnabled ? 'var(--accent-color)' : '#ffffff';
       }
       scanForMusicFiles().then(availableFiles => {
         tracks = availableFiles;
@@ -1135,45 +1114,6 @@
         });
       });
     }
-
-    function updateVolumeIcon(volume) {
-      let path = '';
-      if (volume > 0.5) {
-        path = '<path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/>';
-      } else if (volume > 0) {
-        path = '<path fill="currentColor" d="M5,9V15H9L14,20V4L9,9M18.5,12C18.5,10.23 17.5,8.71 16,7.97V16C17.5,15.29 18.5,13.76 18.5,12Z"/>';
-      } else {
-        path = '<path fill="currentColor" d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12Z"/>';
-      }
-      volumeButton.innerHTML = `<svg viewBox="0 0 24 24">${path}</svg>`;
-    }
-
-    volumeSlider.addEventListener('input', e => {
-      if (currentAudio) {
-        currentAudio.volume = e.target.value;
-        lastVolume = e.target.value;
-        updateVolumeIcon(e.target.value);
-      }
-    });
-
-    volumeButton.addEventListener('click', () => {
-      if (currentAudio) {
-        if (currentAudio.volume > 0) {
-          currentAudio.volume = 0;
-          volumeSlider.value = 0;
-        } else {
-          currentAudio.volume = lastVolume;
-          volumeSlider.value = lastVolume;
-        }
-        updateVolumeIcon(currentAudio.volume);
-      }
-    });
-
-    autoplayToggle.addEventListener('click', () => {
-      autoplayEnabled = !autoplayEnabled;
-      autoplayToggle.classList.toggle('active', autoplayEnabled);
-      localStorage.setItem('autoplayEnabled', autoplayEnabled);
-    });
 
     function scanForMusicFiles() {
       const songList = [{
