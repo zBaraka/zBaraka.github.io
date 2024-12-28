@@ -353,6 +353,25 @@
                     videoGrid.appendChild(card);
                     return card;
                 });
+                addVideoEventListeners();
+            });
+        }
+
+        function addVideoEventListeners() {
+            const videos = document.querySelectorAll('.video-grid video');
+            videos.forEach(video => {
+                video.addEventListener('play', function() {
+                    pauseOtherVideos(this);
+                });
+            });
+        }
+
+        function pauseOtherVideos(currentVideo) {
+            const videos = document.querySelectorAll('.video-grid video');
+            videos.forEach(video => {
+                if (video !== currentVideo) {
+                    video.pause();
+                }
             });
         }
 
