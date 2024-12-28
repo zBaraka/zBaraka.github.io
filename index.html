@@ -1,67 +1,12 @@
-<html>
+<!DOCTYPE html>
+<html lang="de">
 <head>
 <base href="www.skybrute.de">
 <link rel="icon" href="https://i.imgur.com/JP4qYpv.png">
   <meta charset="UTF-8">
   <title>Skybrute</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    #password-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--background-color);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    #password-form {
-      background: var(--card-background);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 5px 15px var(--shadow-color);
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-    }
-
-    #password-input {
-      width: 100%;
-      padding: 1rem;
-      margin: 1rem 0;
-      border: none;
-      border-radius: 8px;
-      background: var(--background-color);
-      color: var(--text-color);
-      font-size: 1rem;
-    }
-
-    #password-submit {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: transform 0.2s;
-    }
-
-    #password-submit:hover {
-      transform: scale(1.05);
-    }
-
-    #password-error {
-      color: #ff4444;
-      margin-top: 1rem;
-      display: none;
-    }
-    
     :root {
       --primary-color: #6200ea;
       --secondary-color: #03dac6;
@@ -538,7 +483,7 @@
     }
 
     .music-grid.video-playing + .theme-toggle {
-      top: 6rem; 
+      top: 6rem;
     }
 
     @media (max-width: 768px) {
@@ -625,7 +570,7 @@
       }
 
       .music-grid.video-playing + .theme-toggle {
-        top: 5.5rem; 
+        top: 5.5rem;
       }
 
       .toggle-button {
@@ -764,6 +709,7 @@
   </style>
 </head>
 <body>
+  <script src="password.js"></script>
   <div class="logo">
     <img src="https://i.imgur.com/xCFfLev.png" alt="SkyBrute Logo" id="logo-image">
   </div>
@@ -830,41 +776,7 @@
     </button>
   </div>
 
-  <div id="password-overlay">
-    <div id="password-form">
-      <h2>Enter Password</h2>
-      <input type="password" id="password-input" placeholder="Password" aria-label="Password input">
-      <button id="password-submit">Submit</button>
-      <p id="password-error">Incorrect password</p>
-    </div>
-  </div>
-
-  <script>function checkPassword() {
-  const correctPassword = 'Angelobot28';
-  const passwordInput = document.getElementById('password-input');
-  const passwordOverlay = document.getElementById('password-overlay');
-  const passwordError = document.getElementById('password-error');
-  const savedAuth = localStorage.getItem('auth');
-  if (savedAuth === correctPassword) {
-    passwordOverlay.style.display = 'none';
-    return;
-  }
-  document.getElementById('password-submit').addEventListener('click', () => {
-    if (passwordInput.value === correctPassword) {
-      passwordOverlay.style.display = 'none';
-      localStorage.setItem('auth', correctPassword);
-    } else {
-      passwordError.style.display = 'block';
-      passwordInput.value = '';
-    }
-  });
-  passwordInput.addEventListener('keypress', e => {
-    if (e.key === 'Enter') {
-      document.getElementById('password-submit').click();
-    }
-  });
-}
-function initTheme() {
+  <script>function initTheme() {
   const theme = localStorage.getItem('theme') || 'dark';
   document.documentElement.setAttribute('data-theme', theme);
   updateThemeIcon(theme);
@@ -1187,7 +1099,6 @@ function handleKeyboardShortcuts(e) {
 }
 document.addEventListener('keydown', handleKeyboardShortcuts);
 document.addEventListener('DOMContentLoaded', () => {
-  checkPassword();
   initTheme();
   document.getElementById('theme-toggle').addEventListener('click', () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
