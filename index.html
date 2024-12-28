@@ -1,8 +1,8 @@
-<html><head><base href="https://example.com/">
+<html><head><base href="https://zbaraka.github.io/">
 <link rel="icon" href="https://i.imgur.com/xCFfLev.png">
   <meta charset="UTF-8">
   <title>Skybrute</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary-color: #6200ea;
@@ -71,6 +71,32 @@
       width: 100%;
       height: auto;
       display: block;
+    }
+
+    .navigation {
+      position: fixed;
+      top: 1rem;
+      right: 70px;
+      z-index: 100;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-button {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      cursor: pointer;
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+      text-decoration: none;
+    }
+
+    .nav-button:hover {
+      color: var(--primary-color);
+      background-color: rgba(255, 255, 255, 0.1);
     }
 
     .search-container {
@@ -441,6 +467,7 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 3px 8px var(--shadow-color);
+      transition: transform 0.3s ease-in-out;
     }
 
     .theme-toggle svg {
@@ -449,6 +476,10 @@
 
     .theme-toggle:hover svg {
       transform: rotate(45deg);
+    }
+
+    .music-grid.video-playing + .theme-toggle {
+      top: 6rem; 
     }
 
     @media (max-width: 768px) {
@@ -461,6 +492,11 @@
         width: 120px;
         top: 0.5rem;
         left: 0.5rem;
+      }
+
+      .navigation {
+        top: 0.5rem;
+        right: 50px;
       }
 
       .search-container {
@@ -527,6 +563,10 @@
         height: 40px;
         top: 0.5rem;
         right: 0.5rem;
+      }
+
+      .music-grid.video-playing + .theme-toggle {
+        top: 5.5rem; 
       }
 
       .toggle-button {
@@ -668,6 +708,9 @@
   <div class="logo">
     <img src="https://i.imgur.com/xCFfLev.png" alt="SkyBrute Logo" id="logo-image">
   </div>
+  <div class="navigation">
+    <a href="videos.html" class="nav-button">Videos</a>
+  </div>
   <div class="container">
     <div class="search-container">
       <input type="text" class="search-input" placeholder="Search songs..." id="search-input" aria-label="Search songs">
@@ -761,8 +804,8 @@
       shuffleButton.style.color = shuffleColor;
     }
 
-    const musicGrid = document.getElementById('music-grid');
-    const nowPlaying = document.getElementById('now-playing');
+    const musicGrid = document.getElementById('music-grid')
+	    const nowPlaying = document.getElementById('now-playing');
     const progressFilled = document.getElementById('progress-filled');
     const progressBar = document.getElementById('progress-bar');
     const progressHandle = document.getElementById('progress-handle');
@@ -896,7 +939,7 @@
     function filterSongs(searchTerm) {
       const normalizedSearch = searchTerm.toLowerCase();
       let hasResults = false;
-      
+
       allMusicCards.forEach(card => {
         const songTitle = card.querySelector('.song-title').textContent.toLowerCase();
         if (songTitle.includes(normalizedSearch)) {
