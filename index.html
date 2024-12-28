@@ -76,7 +76,7 @@
     .navigation {
       position: fixed;
       top: 1rem;
-      right: 70px;
+      right: 120px;
       z-index: 100;
       display: flex;
       gap: 1rem;
@@ -455,7 +455,7 @@
       position: fixed;
       top: 1rem;
       right: 1rem;
-      background: none;
+      background: var(--card-background);
       border: none;
       color: var(--text-color);
       cursor: pointer;
@@ -468,6 +468,7 @@
       justify-content: center;
       box-shadow: 0 3px 8px var(--shadow-color);
       transition: transform 0.3s ease-in-out;
+      z-index: 100;
     }
 
     .theme-toggle svg {
@@ -785,16 +786,16 @@
       let themeIcon = '';
       let logoSrc = '';
       let shuffleColor = '';
+      
       if (theme === 'light') {
         themeIcon = `<svg viewBox="0 0 24 24" width="24" height="24">
-              <path fill="currentColor" d="M20 12l-1.41-1.41-3.54 3.54-1.41 1.41 4.55 0z"/>
-              <path fill="currentColor" d="M12 20l-4.55 0-1.41-1.41 3.54-3.54 1.41-1.41z"/>
+              <path fill="currentColor" d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
             </svg>`;
         logoSrc = 'https://i.imgur.com/ZaT26d8.png';
         shuffleColor = 'var(--accent-color)';
       } else {
         themeIcon = `<svg viewBox="0 0 24 24" width="24" height="24">
-              <path fill="currentColor" d="M12 2c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm0 12c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+              <path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
             </svg>`;
         logoSrc = 'https://i.imgur.com/xCFfLev.png';
         shuffleColor = 'var(--primary-color)';
@@ -846,7 +847,7 @@
       currentSongDisplay.textContent = title;
       const thumbnailContainer = document.getElementById('now-playing-thumbnail');
       thumbnailContainer.innerHTML = thumbnailSrc ? `<img src="${thumbnailSrc}" alt="${title}">` : `<svg viewBox="0 0 24 24">
-               <path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+               <path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
              </svg>`;
     }
 
@@ -1347,8 +1348,6 @@
         }, 100);
       });
     }
-
-    document.addEventListener('contextmenu', event => event.preventDefault());
 
   </script>
 </body>
