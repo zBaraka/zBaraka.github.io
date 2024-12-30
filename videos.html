@@ -11,9 +11,15 @@
             --card-background: #1f1f1f;
             --text-color: #ffffff;
             --accent-color: #bb86fc;
-            --transition-speed: 0.3s;
+            --now-playing-height: 80px;
             --card-hover-scale: 1.05;
             --shadow-color: rgba(0, 0, 0, 0.5);
+            --play-button-color: #ffffff;
+            --play-button-shadow: rgba(0, 0, 0, 0.7);
+            --progress-bar-color: #444;
+            --progress-handle-color: #777;
+            --shuffle-button-color: #ffffff;
+            --shuffle-button-active-color: var(--accent-color);
         }
 
         :root[data-theme="light"] {
@@ -24,6 +30,11 @@
             --text-color: #121212;
             --accent-color: #bb86fc;
             --shadow-color: rgba(0, 0, 0, 0.2);
+            --play-button-color: #121212;
+            --play-button-shadow: rgba(0, 0, 0, 0.2);
+            --progress-bar-color: #ddd;
+            --progress-handle-color: #666;
+            --shuffle-button-color: #121212;
         }
 
         * {
@@ -31,7 +42,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            transition: background-color var(--transition-speed), color var(--transition-speed);
         }
 
         body {
@@ -39,7 +49,7 @@
             color: var(--text-color);
             min-height: 100vh;
             padding: 2rem;
-            position: relative;
+            padding-bottom: 2rem; /* Entfernt die Anpassung für die Now Playing Bar */
         }
 
         .container {
@@ -55,7 +65,6 @@
             width: 150px;
             height: auto;
             z-index: 100;
-            transition: transform var(--transition-speed);
         }
 
         .logo img {
@@ -67,7 +76,7 @@
         .navigation {
             position: fixed;
             top: 1rem;
-            right: 120px; /* Adjusted to match index.html */
+            right: 1rem;
             z-index: 100;
             display: flex;
             gap: 1rem;
@@ -81,7 +90,6 @@
             padding: 0.7rem 1rem;
             font-size: 1rem;
             border-radius: 10px;
-            transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
             text-decoration: none;
         }
 
@@ -127,7 +135,6 @@
             overflow: hidden;
             cursor: pointer;
             box-shadow: 0 5px 15px var(--shadow-color);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             display: flex;
             flex-direction: column;
         }
@@ -137,9 +144,9 @@
             box-shadow: 0 10px 25px var(--shadow-color);
         }
 
-        .video-container {
+        .video-card .thumbnail {
             width: 100%;
-            aspect-ratio: 16/9; /* Standard video aspect ratio */
+            aspect-ratio: 16/9; /* Standard Video Aspect Ratio */
             background: #2a2a2a;
             position: relative;
             overflow: hidden;
@@ -148,11 +155,45 @@
             justify-content: center;
         }
 
-        .video-container video {
+        .video-card .thumbnail video {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.3s ease-in-out;
+        }
+
+        .video-card:hover .thumbnail video {
+            transform: scale(1.1);
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .video-card:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .play-icon {
+            width: 60px;
+            height: 60px;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .play-overlay:hover .play-icon {
+            transform: scale(1.1);
         }
 
         .video-info {
@@ -173,19 +214,125 @@
             white-space: nowrap;
         }
 
-        .no-results {
-            text-align: center;
-            padding: 3rem;
-            color: #888;
-            grid-column: 1 / -1;
-            font-size: 1.2rem;
+        .audio-control {
+            display: none;
         }
 
-        .theme-toggle {
+        #now-playing {
+            display: flex; /* Now Playing Bar in videos.html standardmäßig ausblenden */
             position: fixed;
-            top: 1rem;
-            right: 1rem; /* Adjusted to match index.html */
-            background: var(--card-background); /* Added background to match index.html */
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-background);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            box-shadow: 0 -5px 20px var(--shadow-color);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            height: var(--now-playing-height);
+            backdrop-filter: blur(15px);
+            z-index: 100;
+        }
+
+        .now-playing-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex: 1 1 auto;
+            min-width: 150px;
+            max-width: 400px;
+            overflow: hidden;
+            animation: slideUp 0.5s ease-in-out;
+        }
+
+        .now-playing-thumbnail {
+            width: 70px;
+            height: 70px;
+            border-radius: 14px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 3px 10px var(--shadow-color);
+            transition: transform 0.2s ease-in-out;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .now-playing-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .now-playing-thumbnail:hover {
+            transform: scale(1.05);
+        }
+
+        .now-playing-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .playback-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex: 0 0 auto;
+        }
+
+        .control-button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 0.7rem;
+            border-radius: 50%;
+            transition: color 0.2s ease-in-out, transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-button:hover {
+            color: var(--primary-color);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .control-button.active {
+            color: var(--secondary-color);
+        }
+
+        .control-button.active svg path {
+            fill: var(--primary-color);
+        }
+
+        .control-button svg {
+            width: 30px;
+            height: 30px;
+        }
+
+        .shuffle-button {
+            color: var(--shuffle-button-color);
+        }
+
+        .shuffle-button.active {
+            color: var(--shuffle-button-active-color);
+        }
+
+        :root[data-theme="light"] .shuffle-button {
+            color: var(--shuffle-button-color);
+        }
+
+        .control-circle {
+            background: var(--card-background);
             border: none;
             color: var(--text-color);
             cursor: pointer;
@@ -197,20 +344,299 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 3px 8px var(--shadow-color);
-            z-index: 100;
         }
 
-        .theme-toggle svg {
-            transition: transform 0.3s ease-in-out;
+        .control-circle svg {
+            width: 24px;
+            height: 24px;
         }
 
-        .theme-toggle:hover svg {
-            transform: rotate(45deg);
+        .control-circle.active {
+            color: var(--accent-color);
+        }
+
+        .progress-container {
+            flex: 2 1 300px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0 1.5rem;
+            width: 100%;
+            animation: zoomIn 0.5s ease-in-out;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--progress-bar-color);
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .progress-filled {
+            height: 100%;
+            background: var(--primary-color);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .progress-handle {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            width: 16px;
+            height: 16px;
+            background: var(--progress-handle-color);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+
+        .progress-handle:active {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.2);
+            background-color: white;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0 1.5rem;
+            flex: 0 0 auto;
+        }
+
+        .volume-slider {
+            width: 120px;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            background-color: white;
+        }
+
+        .toggle-button {
+            display: none;
+        }
+
+        .time-display {
+            font-size: 1rem;
+            color: var(--text-color);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+            grid-column: 1 / -1;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+                padding-bottom: 0rem; /* Now Playing Bar ist ausgeblendet */
+            }
+
+            .logo {
+                width: 120px;
+                top: 0.5rem;
+                left: 0.5rem;
+            }
+
+            .navigation {
+                top: 0.5rem;
+                right: 1rem;
+                gap: 0.5rem;
+            }
+
+            .search-container {
+                margin: 3rem auto 1rem;
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .video-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 1rem;
+            }
+
+            .play-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            .video-info {
+                padding: 1rem;
+            }
+
+            #now-playing {
+                padding: 0.8rem 1rem;
+                gap: 0.5rem;
+            }
+
+            .now-playing-thumbnail {
+                width: 50px;
+                height: 50px;
+            }
+
+            .now-playing-info {
+                min-width: auto;
+                max-width: none;
+                gap: 0.8rem;
+            }
+
+            .now-playing-title {
+                display: none;
+            }
+
+            .playback-controls {
+                gap: 0.8rem;
+            }
+
+            .control-button svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            .progress-container {
+                flex: 1;
+                margin: 0;
+            }
+
+            .volume-control {
+                display: none;
+            }
+
+            .control-circle {
+                width: 40px;
+                height: 40px;
+            }
+
+            .control-circle svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-grid {
+                padding: 0.8rem;
+                gap: 1rem;
+            }
+
+            .play-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .video-info {
+                padding: 0.8rem;
+            }
+
+            #now-playing {
+                padding: 0.6rem 0.8rem;
+                gap: 0.3rem;
+            }
+
+            .now-playing-thumbnail {
+                width: 40px;
+                height: 40px;
+            }
+
+            .playback-controls {
+                gap: 0.5rem;
+            }
+
+            .control-button svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .time-display {
+                font-size: 0.8rem;
+                min-width: 70px;
+            }
+        }
+
+        @media (max-width: 768px) and (orientation: portrait) {
+            #now-playing {
+                display: none; /* Now Playing Bar ist ausgeblendet */
+            }
+
+            body {
+                padding-bottom: 0rem;
+            }
+        }
+
+        @media (max-width: 768px) and (orientation: landscape) {
+            #now-playing {
+                display: none;
+            }
+
+            body {
+                padding-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) and (orientation: portrait) {
+            #now-playing {
+                display: none;
+            }
+
+            body {
+                padding-bottom: 0rem;
+            }
+        }
+
+        @media (max-width: 480px) and (orientation: landscape) {
+            #now-playing {
+                display: none;
+            }
+
+            body {
+                padding-bottom: 0.8rem;
+            }
         }
 
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         @keyframes fadeInUp {
@@ -224,9 +650,15 @@
             }
         }
 
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -236,12 +668,22 @@
     </div>
     <div class="navigation">
         <a href="https://www.skybrute.de/" class="nav-button">Music</a>
+        <button class="control-circle" id="autoplay-toggle" aria-label="Toggle Autoplay">
+            <svg viewBox="0 0 24 24">
+                <path fill="currentColor" d="M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z"/>
+            </svg>
+        </button>
+        <button class="control-circle shuffle-button" id="shuffle-button" aria-label="Shuffle">
+            <svg viewBox="0 0 24 24">
+                <path fill="currentColor" d="M17,3L22.25,7.5L17,12L22.25,16.5L17,21V18H14.26L11.44,15.18L13.56,13.06L15.5,15H17V12L17,9H15.5L6.5,18H2V15H5.26L14.26,6H17V3M2,6H6.5L9.32,8.82L7.2,10.94L5.26,9H2V6Z"/>
+            </svg>
+        </button>
+        <button class="control-circle" id="theme-toggle" aria-label="Toggle theme">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor" d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M3,9V15H7L12,20V4L7,9H3Z"/>
+            </svg>
+        </button>
     </div>
-    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-            <path fill="currentColor" d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M3,9V15H7L12,20V4L7,9H3Z"/>
-        </svg>
-    </button>
     <div class="container">
         <div class="search-container">
             <input type="text" class="search-input" placeholder="Search videos..." id="search-input" aria-label="Search videos">
@@ -251,64 +693,148 @@
         </div>
     </div>
 
+    <div id="now-playing">
+        <div class="now-playing-info">
+            <div class="now-playing-thumbnail" id="now-playing-thumbnail"></div>
+            <span class="now-playing-title" id="current-song">Nothing playing</span>
+        </div>
+        <div class="playback-controls">
+            <button class="control-button" id="prev-track" aria-label="Previous Track">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6,18V6H8V18H6M9.5,12L18,6V18L9.5,12Z"/></svg>
+            </button>
+            <button class="control-button" id="play-pause-control" aria-label="Play/Pause">
+                <svg viewBox="0 0 24 24" id="play-pause-icon">
+                    <path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/>
+                </svg>
+            </button>
+            <button class="control-button" id="next-track" aria-label="Next Track">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M16,18H18V6H16M6,18L14.5,12L6,6V18Z"/></svg>
+            </button>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar" aria-label="Progress Bar">
+                <div class="progress-filled" id="progress-filled"></div>
+                <div class="progress-handle" id="progress-handle"></div>
+            </div>
+            <div class="time-display" id="time-display">0:00 / 0:00</div>
+        </div>
+        <div class="volume-control">
+            <button class="control-button" id="volume-button" aria-label="Toggle Volume">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/>
+                </svg>
+            </button>
+            <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.01" value="1" aria-label="Volume Slider">
+        </div>
+    </div>
+
     <script>
-        function initTheme() {
-            const theme = localStorage.getItem('theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', theme);
-            updateThemeIcon(theme);
-        }
-
-        function updateThemeIcon(theme) {
-            const themeToggle = document.getElementById('theme-toggle');
-            const logoImage = document.getElementById('logo-image');
-            let themeIcon = '';
-            let logoSrc = '';
-            if (theme === 'light') {
-                themeIcon = `<svg viewBox="0 0 24 24" width="24" height="24">
-              <path fill="currentColor" d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
-            </svg>`;
-                logoSrc = 'https://i.imgur.com/ZaT26d8.png';
-            } else {
-                themeIcon = `<svg viewBox="0 0 24 24" width="24" height="24">
-              <path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
-            </svg>`;
-                logoSrc = 'https://i.imgur.com/xCFfLev.png';
-            }
-            themeToggle.innerHTML = themeIcon;
-            logoImage.src = logoSrc;
-        }
-
         const videoGrid = document.getElementById('video-grid');
         const searchInput = document.getElementById('search-input');
         let allVideoCards = [];
+        let currentVideoIndex = 0;
+        let isPlaying = false;
+        let isShuffle = false;
+        let isAutoplay = false;
+        let videoList = [
+            {
+                title: 'Alles Überflüssig',
+                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Alles%20%C3%BCberfl%C3%BCssig.mp4'
+            },
+            {
+                title: 'Das Winny Schwein',
+                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Das%20Winny%20Schwein.mp4'
+            },
+            {
+                title: 'GEBM ist',
+                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/GEBM%20ist.mp4'
+            },
+            {
+                title: 'Gegen Hass und Disskrimierung',
+                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Gegen%20Hass%20und%20Disskrimierung.mp4'
+            },
+            {
+                title: 'Hey Stan du Wicht',
+                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Hey%20Stan%20du%20Wicht.mp4'
+            },
+            {
+                title: 'IchbineinSoziopathfeat.MimonBaraka',
+                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/IchbineinSoziopathfeat.MimonBaraka.mp4'
+            },
+            {
+                title: 'Monster in der Hose',
+                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Monster%20in%20der%20Hose.mp4'
+            },
+            {
+                title: 'Nie wieder Krieg',
+                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Nie_wieder_krieg.mp4'
+            },
+            {
+                title: 'Oh Clyde',
+                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Oh%20Clyde.mp4'
+            },
+            {
+                title: 'Triolige Reise',
+                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Triolige%20Reise.mp4'
+            }
+        ];
+        let shuffledVideoList = [];
+        let currentVideoElement = null;
+
+        const nowPlaying = document.getElementById('now-playing');
+        const playPauseControl = document.getElementById('play-pause-control');
+        const playPauseIcon = document.getElementById('play-pause-icon');
+        const prevTrackButton = document.getElementById('prev-track');
+        const nextTrackButton = document.getElementById('next-track');
+        const progressBar = document.getElementById('progress-bar');
+        const progressFilled = document.getElementById('progress-filled');
+        const progressHandle = document.getElementById('progress-handle');
+        const timeDisplay = document.getElementById('time-display');
+        const volumeButton = document.getElementById('volume-button');
+        const volumeSlider = document.getElementById('volume-slider');
+        const nowPlayingThumbnail = document.getElementById('now-playing-thumbnail');
+        const currentSongTitle = document.getElementById('current-song');
+        const shuffleButton = document.getElementById('shuffle-button');
+        const autoplayToggle = document.getElementById('autoplay-toggle');
 
         function createVideoCard(video, index) {
             const card = document.createElement('div');
             card.className = 'video-card';
-            card.setAttribute('data-index', index);
+            const thumbnailHtml = `<div class="thumbnail">
+              <video src="${video.path}" alt="${video.title}"></video>
+              <div class="play-overlay">
+                <svg class="play-icon" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/>
+                </svg>
+              </div>
+            </div>`;
+            card.innerHTML = `
+            ${thumbnailHtml}
+            <div class="video-info">
+              <div class="video-title">${video.title}</div>
+            </div>
+          `;
+            const videoElement = card.querySelector('video');
+            const playOverlay = card.querySelector('.play-overlay');
 
-            let videoHtml = `
-                <div class="video-container">
-                    <video src="${video.path}" controls></video>
-                </div>
-                <div class="video-info">
-                    <div class="video-title">${video.title}</div>
-                </div>
-            `;
+            playOverlay.addEventListener('click', () => {
+                loadAndPlayVideo(index);
+            });
 
-            card.innerHTML = videoHtml;
+            videoElement.addEventListener('ended', () => {
+                playOverlay.innerHTML = `<svg class="play-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>`;
+            });
 
             return card;
         }
 
-        searchInput.addEventListener('input', (e) => {
+        searchInput.addEventListener('input', e => {
             filterVideos(e.target.value);
         });
 
         function filterVideos(searchTerm) {
             const normalizedSearch = searchTerm.toLowerCase();
             let hasResults = false;
-
             allVideoCards.forEach(card => {
                 const videoTitle = card.querySelector('.video-title').textContent.toLowerCase();
                 if (videoTitle.includes(normalizedSearch)) {
@@ -318,12 +844,10 @@
                     card.style.display = 'none';
                 }
             });
-
             const existingNoResults = videoGrid.querySelector('.no-results');
             if (existingNoResults) {
                 existingNoResults.remove();
             }
-
             if (!hasResults && searchTerm) {
                 const noResults = document.createElement('div');
                 noResults.className = 'no-results';
@@ -332,99 +856,180 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            document.getElementById('theme-toggle').addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                updateThemeIcon(newTheme);
+        function renderVideoCards(videos) {
+            videoGrid.innerHTML = '';
+            allVideoCards = videos.map((video, index) => {
+                const card = createVideoCard(video, index);
+                videoGrid.appendChild(card);
+                return card;
             });
-            initializeVideoGallery();
+        }
+
+        function setupEventListeners() {
+            playPauseControl.addEventListener('click', togglePlayPause);
+            prevTrackButton.addEventListener('click', playPrevTrack);
+            nextTrackButton.addEventListener('click', playNextTrack);
+            shuffleButton.addEventListener('click', toggleShuffle);
+            autoplayToggle.addEventListener('click', toggleAutoplay);
+            volumeButton.addEventListener('click', toggleMute);
+            volumeSlider.addEventListener('input', setVolume);
+
+            progressBar.addEventListener('click', seekVideo);
+            progressHandle.addEventListener('mousedown', (e) => {
+                document.addEventListener('mousemove', dragHandle);
+                document.addEventListener('mouseup', stopDrag);
+            });
+        }
+
+        function loadAndPlayVideo(index) {
+            currentVideoIndex = index;
+            updateNowPlaying();
+            playCurrentVideo();
+            nowPlaying.style.display = 'flex';
+        }
+
+        function updateNowPlaying() {
+            const currentVideo = isShuffle ? shuffledVideoList[currentVideoIndex] : videoList[currentVideoIndex];
+            currentSongTitle.textContent = currentVideo.title;
+            nowPlayingThumbnail.innerHTML = `<video src="${currentVideo.path}" style="width: 100%; height: 100%; object-fit: cover;"></video>`;
+        }
+
+        function playCurrentVideo() {
+            if (currentVideoElement) {
+                currentVideoElement.pause();
+            }
+            currentVideoElement = nowPlayingThumbnail.querySelector('video');
+            if (currentVideoElement) {
+                currentVideoElement.play();
+                isPlaying = true;
+                updatePlayPauseIcon();
+                currentVideoElement.addEventListener('timeupdate', updateProgress);
+                currentVideoElement.addEventListener('ended', playNextOnEnd);
+            }
+        }
+
+        function pauseCurrentVideo() {
+            if (currentVideoElement && !currentVideoElement.paused) {
+                currentVideoElement.pause();
+                isPlaying = false;
+                updatePlayPauseIcon();
+            }
+        }
+
+        function togglePlayPause() {
+            if (!currentVideoElement) return;
+            if (isPlaying) {
+                pauseCurrentVideo();
+            } else {
+                playCurrentVideo();
+            }
+        }
+
+        function updatePlayPauseIcon() {
+            playPauseIcon.innerHTML = isPlaying
+                ? '<path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z"/>'
+                : '<path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/>';
+        }
+
+        function playPrevTrack() {
+            if (videoList.length === 0) return;
+            currentVideoIndex = (currentVideoIndex - 1 + videoList.length) % videoList.length;
+            updateNowPlaying();
+            playCurrentVideo();
+        }
+
+        function playNextTrack() {
+            if (videoList.length === 0) return;
+            currentVideoIndex = (currentVideoIndex + 1) % videoList.length;
+            updateNowPlaying();
+            playCurrentVideo();
+        }
+
+        function playNextOnEnd() {
+            if (isAutoplay) {
+                playNextTrack();
+            } else {
+                isPlaying = false;
+                updatePlayPauseIcon();
+            }
+        }
+
+        function updateProgress() {
+            if (currentVideoElement) {
+                const { currentTime, duration } = currentVideoElement;
+                const progressPercent = (currentTime / duration) * 100;
+                progressFilled.style.width = `${progressPercent}%`;
+                progressHandle.style.left = `${progressPercent}%`;
+                timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+            }
+        }
+
+        function formatTime(time) {
+            const minutes = Math.floor(time / 60);
+            const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+            return `${minutes}:${seconds}`;
+        }
+
+        function seekVideo(e) {
+            if (!currentVideoElement) return;
+            const rect = progressBar.getBoundingClientRect();
+            const clickPosition = e.clientX - rect.left;
+            const totalWidth = rect.width;
+            const seekTime = (clickPosition / totalWidth) * currentVideoElement.duration;
+            currentVideoElement.currentTime = seekTime;
+        }
+
+        function dragHandle(e) {
+            if (!currentVideoElement) return;
+            const rect = progressBar.getBoundingClientRect();
+            const position = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+            const time = (position / rect.width) * currentVideoElement.duration;
+            currentVideoElement.currentTime = time;
+            updateProgress();
+        }
+
+        function stopDrag() {
+            document.removeEventListener('mousemove', dragHandle);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        function toggleMute() {
+            if (!currentVideoElement) return;
+            currentVideoElement.muted = !currentVideoElement.muted;
+            volumeButton.innerHTML = currentVideoElement.muted
+                ? '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,12A1.5,1.5 0 0,1 15,10.5A1.5,1.5 0 0,1 16.5,9A1.5,1.5 0 0,1 18,10.5A1.5,1.5 0 0,1 16.5,12M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M9.97,5L7.59,6.39L9.18,8L6,8V16L9.18,16L7.59,17.61L9.97,19.03C9.5,19.2 9,19.04 8.66,18.66L5,15H3V9H5L8.66,5.34C9,4.96 9.5,4.8 9.97,5Z"/></svg>'
+                : '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/></svg>';
+        }
+
+        function setVolume() {
+            if (currentVideoElement) {
+                currentVideoElement.volume = volumeSlider.value;
+            }
+        }
+
+        function toggleShuffle() {
+            isShuffle = !isShuffle;
+            shuffleButton.classList.toggle('active', isShuffle);
+            if (isShuffle) {
+                shuffledVideoList = [...videoList].sort(() => Math.random() - 0.5);
+            }
+        }
+
+        function toggleAutoplay() {
+            isAutoplay = !isAutoplay;
+            autoplayToggle.classList.toggle('active', isAutoplay);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            renderVideoCards(videoList);
+            updateNowPlayingInfo();
         });
 
-        function initializeVideoGallery() {
-            videoGrid.innerHTML = '';
-            scanForVideoFiles().then(availableFiles => {
-                allVideoCards = availableFiles.map((video, index) => {
-                    const card = createVideoCard(video, index);
-                    videoGrid.appendChild(card);
-                    return card;
-                });
-                addVideoEventListeners();
-            });
-        }
-
-        function addVideoEventListeners() {
-            const videos = document.querySelectorAll('.video-grid video');
-            videos.forEach(video => {
-                video.addEventListener('play', function() {
-                    pauseOtherVideos(this);
-                });
-            });
-        }
-
-        function pauseOtherVideos(currentVideo) {
-            const videos = document.querySelectorAll('.video-grid video');
-            videos.forEach(video => {
-                if (video !== currentVideo) {
-                    video.pause();
-                }
-            });
-        }
-
-        function scanForVideoFiles() {
-            const videoList = [
-                {
-                    title: 'Alles Überflüssig',
-                    path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Alles%20%C3%BCberfl%C3%BCssig.mp4'
-                },
-                {
-                    title: 'Das Winny Schwein',
-                    path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Das%20Winny%20Schwein.mp4'
-                },
-                {
-                    title: 'GEBM ist',
-                    path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/GEBM%20ist.mp4'
-                },
-                {
-                    title: 'Gegen Hass und Disskrimierung',
-                    path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Gegen%20Hass%20und%20Disskrimierung.mp4'
-                },
-                {
-                    title: 'Hey Stan du Wicht',
-                    path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Hey%20Stan%20du%20Wicht.mp4'
-                },
-                {
-                    title: 'IchbineinSoziopathfeat.MimonBaraka',
-                    path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/IchbineinSoziopathfeat.MimonBaraka.mp4'
-                },
-                {
-                    title: 'Monster in der Hose',
-                    path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Monster%20in%20der%20Hose.mp4'
-                },
-                {
-                    title: 'Nie wieder Krieg',
-                    path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Nie_wieder_krieg.mp4'
-                },
-                {
-                    title: 'Oh Clyde',
-                    path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Oh%20Clyde.mp4'
-                },
-                {
-                    title: 'Triolige Reise',
-                    path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Triolige%20Reise.mp4'
-                }
-            ];
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve(videoList);
-                }, 100);
-            });
+        function updateNowPlayingInfo() {
+            currentSongTitle.textContent = 'Nothing playing';
+            nowPlayingThumbnail.innerHTML = '';
         }
     </script>
 </body>
 </html>
-
-
