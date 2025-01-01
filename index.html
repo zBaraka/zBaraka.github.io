@@ -731,6 +731,7 @@
   const theme = localStorage.getItem('theme') || 'dark';
   document.documentElement.setAttribute('data-theme', theme);
   updateThemeIcon(theme);
+}
 function updateThemeIcon(theme) {
   const themeToggle = document.getElementById('theme-toggle');
   const logoImage = document.getElementById('logo-image');
@@ -738,32 +739,22 @@ function updateThemeIcon(theme) {
   let themeIcon = '';
   let logoSrc = '';
   let shuffleColor = '';
-
   if (theme === 'light') {
-    themeIcon = `<svg viewBox="0 0 24 24" width="24" height="24">
+    themeIcon = <svg viewBox="0 0 24 24" width="24" height="24">
           <path fill="currentColor" d="M20 15.31L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
-        </svg>`;
-    logoSrc = 'https://i.imgur.com/ZaT26d8.png'; // White Mode Logo URL
+        </svg>;
+    logoSrc = 'logo_darkmode.png';
     shuffleColor = 'var(--shuffle-button-active-color)';
   } else {
-    themeIcon = `<svg viewBox="0 0 24 24" width="24" height="24"> 
+    themeIcon = <svg viewBox="0 0 24 24" width="24" height="24"> 
           <path fill="currentColor" d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36c-0.98,1.37-2.58,2.26-4.4,2.26 c-3.03,0-5.5-2.47-5.5-5.5c0-1.82,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"/>
-        </svg>`;
-    logoSrc = 'logo_darkmode.png'; // Dark Mode Logo URL
+        </svg>;
+    logoSrc = 'https://i.imgur.com/xCFfLev.png';
     shuffleColor = 'var(--shuffle-button-color)';
   }
-
-  if (themeToggle) {
-    themeToggle.innerHTML = themeIcon;
-  }
-  if (logoImage) {
-    logoImage.src = logoSrc;
-  } else {
-    console.error('Logo element with id "logo-image" not found.');
-  }
-  if (shuffleButton) {
-    shuffleButton.style.color = shuffleColor;
-  }
+  themeToggle.innerHTML = themeIcon;
+  logoImage.src = logoSrc;
+  shuffleButton.style.color = shuffleColor;
 }
 
 const musicGrid = document.getElementById('music-grid');
