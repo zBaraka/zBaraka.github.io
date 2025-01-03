@@ -2,7 +2,7 @@
     <link rel="icon" href="https://i.imgur.com/JP4qYpv.png">
     <meta charset="UTF-8">
     <title>Skybrute - Videos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #6200ea;
@@ -96,6 +96,11 @@
         .nav-button:hover {
             color: var(--primary-color);
             background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        :root[data-theme="light"] .nav-button:hover {
+            color: var(--primary-color);
+            background-color: rgba(0, 0, 0, 0.05);
         }
 
         .search-container {
@@ -306,6 +311,11 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
 
+        :root[data-theme="light"] .control-button:hover {
+            color: var(--primary-color);
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
         .control-button.active {
             color: var(--secondary-color);
         }
@@ -452,7 +462,11 @@
         }
 
         .theme-toggle {
-            display: none;
+            display: block;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-color);
         }
 
         @media (max-width: 768px) {
@@ -728,79 +742,66 @@
         </div>
     </div>
 
-    <script>
-        const videoGrid = document.getElementById('video-grid');
-        const searchInput = document.getElementById('search-input');
-        let allVideoCards = [];
-        let currentVideoIndex = 0;
-        let isPlaying = false;
-        let isShuffle = false;
-        let isAutoplay = false;
-        let videoList = [
-            {
-                title: 'Alles Überflüssig',
-                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Alles%20%C3%BCberfl%C3%BCssig.mp4'
-            },
-            {
-                title: 'Das Winny Schwein',
-                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Das%20Winny%20Schwein.mp4'
-            },
-            {
-                title: 'GEBM ist',
-                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/GEBM%20ist.mp4'
-            },
-            {
-                title: 'Gegen Hass und Disskrimierung',
-                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Gegen%20Hass%20und%20Disskrimierung.mp4'
-            },
-            {
-                title: 'Hey Stan du Wicht',
-                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Hey%20Stan%20du%20Wicht.mp4'
-            },
-            {
-                title: 'IchbineinSoziopathfeat.MimonBaraka',
-                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/IchbineinSoziopathfeat.MimonBaraka.mp4'
-            },
-            {
-                title: 'Monster in der Hose',
-                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Monster%20in%20der%20Hose.mp4'
-            },
-            {
-                title: 'Nie wieder Krieg',
-                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Nie_wieder_krieg.mp4'
-            },
-            {
-                title: 'Oh Clyde',
-                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Oh%20Clyde.mp4'
-            },
-            {
-                title: 'Triolige Reise',
-                path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Triolige%20Reise.mp4'
-            }
-        ];
-        let shuffledVideoList = [];
-        let currentVideoElement = null;
-
-        const nowPlaying = document.getElementById('now-playing');
-        const playPauseControl = document.getElementById('play-pause-control');
-        const playPauseIcon = document.getElementById('play-pause-icon');
-        const prevTrackButton = document.getElementById('prev-track');
-        const nextTrackButton = document.getElementById('next-track');
-        const progressBar = document.getElementById('progress-bar');
-        const progressFilled = document.getElementById('progress-filled');
-        const progressHandle = document.getElementById('progress-handle');
-        const timeDisplay = document.getElementById('time-display');
-        const volumeButton = document.getElementById('volume-button');
-        const volumeSlider = document.getElementById('volume-slider');
-        const nowPlayingThumbnail = document.getElementById('now-playing-thumbnail');
-        const currentSongTitle = document.getElementById('current-song');
-        const shuffleButton = document.getElementById('shuffle-button');
-        const autoplayToggle = document.getElementById('autoplay-toggle');
-
-        function createVideoCard(video, index) {
-            const card = document.createElement('div');
-            card.className = 'video-card';
-            const thumbnailHtml = `<div class="thumbnail">
+    <script>const videoGrid = document.getElementById('video-grid');
+const searchInput = document.getElementById('search-input');
+let allVideoCards = [];
+let currentVideoIndex = 0;
+let isPlaying = false;
+let isShuffle = false;
+let isAutoplay = false;
+let videoList = [{
+  title: 'Alles Überflüssig',
+  path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Alles%20%C3%BCberfl%C3%BCssig.mp4'
+}, {
+  title: 'Das Winny Schwein',
+  path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Das%20Winny%20Schwein.mp4'
+}, {
+  title: 'GEBM ist',
+  path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/GEBM%20ist.mp4'
+}, {
+  title: 'Gegen Hass und Disskrimierung',
+  path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Gegen%20Hass%20und%20Disskrimierung.mp4'
+}, {
+  title: 'Hey Stan du Wicht',
+  path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Hey%20Stan%20du%20Wicht.mp4'
+}, {
+  title: 'IchbineinSoziopathfeat.MimonBaraka',
+  path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/IchbineinSoziopathfeat.MimonBaraka.mp4'
+}, {
+  title: 'Monster in der Hose',
+  path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Monster%20in%20der%20Hose.mp4'
+}, {
+  title: 'Nie wieder Krieg',
+  path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Nie_wieder_krieg.mp4'
+}, {
+  title: 'Oh Clyde',
+  path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Oh%20Clyde.mp4'
+}, {
+  title: 'Triolige Reise',
+  path: 'https://ia902204.us.archive.org/16/items/rgrdhrhrtrdjhdrjd/Triolige%20Reise.mp4'
+}];
+let shuffledVideoList = [];
+let currentVideoElement = null;
+const nowPlaying = document.getElementById('now-playing');
+const playPauseControl = document.getElementById('play-pause-control');
+const playPauseIcon = document.getElementById('play-pause-icon');
+const prevTrackButton = document.getElementById('prev-track');
+const nextTrackButton = document.getElementById('next-track');
+const progressBar = document.getElementById('progress-bar');
+const progressFilled = document.getElementById('progress-filled');
+const progressHandle = document.getElementById('progress-handle');
+const timeDisplay = document.getElementById('time-display');
+const volumeButton = document.getElementById('volume-button');
+const volumeSlider = document.getElementById('volume-slider');
+const nowPlayingThumbnail = document.getElementById('now-playing-thumbnail');
+const currentSongTitle = document.getElementById('current-song');
+const shuffleButton = document.getElementById('shuffle-button');
+const autoplayToggle = document.getElementById('autoplay-toggle');
+let currentTheme = 'dark';
+function createVideoCard(video, index) {
+  const card = document.createElement('div');
+  card.className = 'video-card';
+  const thumbnailHtml = `<div class="thumbnail">
               <video src="${video.path}" alt="${video.title}"></video>
               <div class="play-overlay">
                 <svg class="play-icon" viewBox="0 0 24 24">
@@ -808,228 +809,220 @@
                 </svg>
               </div>
             </div>`;
-            card.innerHTML = `
+  card.innerHTML = `
             ${thumbnailHtml}
             <div class="video-info">
               <div class="video-title">${video.title}</div>
             </div>
           `;
-            const videoElement = card.querySelector('video');
-            const playOverlay = card.querySelector('.play-overlay');
-
-            playOverlay.addEventListener('click', () => {
-                loadAndPlayVideo(index);
-            });
-
-            videoElement.addEventListener('ended', () => {
-                playOverlay.innerHTML = `<svg class="play-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>`;
-            });
-
-            return card;
-        }
-
-        searchInput.addEventListener('input', e => {
-            filterVideos(e.target.value);
-        });
-
-        function filterVideos(searchTerm) {
-            const normalizedSearch = searchTerm.toLowerCase();
-            let hasResults = false;
-            allVideoCards.forEach(card => {
-                const videoTitle = card.querySelector('.video-title').textContent.toLowerCase();
-                if (videoTitle.includes(normalizedSearch)) {
-                    card.style.display = 'block';
-                    hasResults = true;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-            const existingNoResults = videoGrid.querySelector('.no-results');
-            if (existingNoResults) {
-                existingNoResults.remove();
-            }
-            if (!hasResults && searchTerm) {
-                const noResults = document.createElement('div');
-                noResults.className = 'no-results';
-                noResults.textContent = 'No videos found matching your search';
-                videoGrid.appendChild(noResults);
-            }
-        }
-
-        function renderVideoCards(videos) {
-            videoGrid.innerHTML = '';
-            allVideoCards = videos.map((video, index) => {
-                const card = createVideoCard(video, index);
-                videoGrid.appendChild(card);
-                return card;
-            });
-        }
-
-        function setupEventListeners() {
-            playPauseControl.addEventListener('click', togglePlayPause);
-            prevTrackButton.addEventListener('click', playPrevTrack);
-            nextTrackButton.addEventListener('click', playNextTrack);
-            shuffleButton.addEventListener('click', toggleShuffle);
-            autoplayToggle.addEventListener('click', toggleAutoplay);
-            volumeButton.addEventListener('click', toggleMute);
-            volumeSlider.addEventListener('input', setVolume);
-
-            progressBar.addEventListener('click', seekVideo);
-            progressHandle.addEventListener('mousedown', (e) => {
-                document.addEventListener('mousemove', dragHandle);
-                document.addEventListener('mouseup', stopDrag);
-            });
-        }
-
-        function loadAndPlayVideo(index) {
-            currentVideoIndex = index;
-            updateNowPlaying();
-            playCurrentVideo();
-            nowPlaying.style.display = 'flex';
-        }
-
-        function updateNowPlaying() {
-            const currentVideo = isShuffle ? shuffledVideoList[currentVideoIndex] : videoList[currentVideoIndex];
-            currentSongTitle.textContent = currentVideo.title;
-            nowPlayingThumbnail.innerHTML = `<video src="${currentVideo.path}" style="width: 100%; height: 100%; object-fit: cover;"></video>`;
-        }
-
-        function playCurrentVideo() {
-            if (currentVideoElement) {
-                currentVideoElement.pause();
-            }
-            currentVideoElement = nowPlayingThumbnail.querySelector('video');
-            if (currentVideoElement) {
-                currentVideoElement.play();
-                isPlaying = true;
-                updatePlayPauseIcon();
-                currentVideoElement.addEventListener('timeupdate', updateProgress);
-                currentVideoElement.addEventListener('ended', playNextOnEnd);
-            }
-        }
-
-        function pauseCurrentVideo() {
-            if (currentVideoElement && !currentVideoElement.paused) {
-                currentVideoElement.pause();
-                isPlaying = false;
-                updatePlayPauseIcon();
-            }
-        }
-
-        function togglePlayPause() {
-            if (!currentVideoElement) return;
-            if (isPlaying) {
-                pauseCurrentVideo();
-            } else {
-                playCurrentVideo();
-            }
-        }
-
-        function updatePlayPauseIcon() {
-            playPauseIcon.innerHTML = isPlaying
-                ? '<path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z"/>'
-                : '<path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/>';
-        }
-
-        function playPrevTrack() {
-            if (videoList.length === 0) return;
-            currentVideoIndex = (currentVideoIndex - 1 + videoList.length) % videoList.length;
-            updateNowPlaying();
-            playCurrentVideo();
-        }
-
-        function playNextTrack() {
-            if (videoList.length === 0) return;
-            currentVideoIndex = (currentVideoIndex + 1) % videoList.length;
-            updateNowPlaying();
-            playCurrentVideo();
-        }
-
-        function playNextOnEnd() {
-            if (isAutoplay) {
-                playNextTrack();
-            } else {
-                isPlaying = false;
-                updatePlayPauseIcon();
-            }
-        }
-
-        function updateProgress() {
-            if (currentVideoElement) {
-                const { currentTime, duration } = currentVideoElement;
-                const progressPercent = (currentTime / duration) * 100;
-                progressFilled.style.width = `${progressPercent}%`;
-                progressHandle.style.left = `${progressPercent}%`;
-                timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
-            }
-        }
-
-        function formatTime(time) {
-            const minutes = Math.floor(time / 60);
-            const seconds = Math.floor(time % 60).toString().padStart(2, '0');
-            return `${minutes}:${seconds}`;
-        }
-
-        function seekVideo(e) {
-            if (!currentVideoElement) return;
-            const rect = progressBar.getBoundingClientRect();
-            const clickPosition = e.clientX - rect.left;
-            const totalWidth = rect.width;
-            const seekTime = (clickPosition / totalWidth) * currentVideoElement.duration;
-            currentVideoElement.currentTime = seekTime;
-        }
-
-        function dragHandle(e) {
-            if (!currentVideoElement) return;
-            const rect = progressBar.getBoundingClientRect();
-            const position = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-            const time = (position / rect.width) * currentVideoElement.duration;
-            currentVideoElement.currentTime = time;
-            updateProgress();
-        }
-
-        function stopDrag() {
-            document.removeEventListener('mousemove', dragHandle);
-            document.removeEventListener('mouseup', stopDrag);
-        }
-
-        function toggleMute() {
-            if (!currentVideoElement) return;
-            currentVideoElement.muted = !currentVideoElement.muted;
-            volumeButton.innerHTML = currentVideoElement.muted
-                ? '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,12A1.5,1.5 0 0,1 15,10.5A1.5,1.5 0 0,1 16.5,9A1.5,1.5 0 0,1 18,10.5A1.5,1.5 0 0,1 16.5,12M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M9.97,5L7.59,6.39L9.18,8L6,8V16L9.18,16L7.59,17.61L9.97,19.03C9.5,19.2 9,19.04 8.66,18.66L5,15H3V9H5L8.66,5.34C9,4.96 9.5,4.8 9.97,5Z"/></svg>'
-                : '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/></svg>';
-        }
-
-        function setVolume() {
-            if (currentVideoElement) {
-                currentVideoElement.volume = volumeSlider.value;
-            }
-        }
-
-        function toggleShuffle() {
-            isShuffle = !isShuffle;
-            shuffleButton.classList.toggle('active', isShuffle);
-            if (isShuffle) {
-                shuffledVideoList = [...videoList].sort(() => Math.random() - 0.5);
-            }
-        }
-
-        function toggleAutoplay() {
-            isAutoplay = !isAutoplay;
-            autoplayToggle.classList.toggle('active', isAutoplay);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            setupEventListeners();
-            renderVideoCards(videoList);
-            updateNowPlayingInfo();
-        });
-
-        function updateNowPlayingInfo() {
-            currentSongTitle.textContent = 'Nothing playing';
-            nowPlayingThumbnail.innerHTML = '';
-        }
-    </script>
+  const videoElement = card.querySelector('video');
+  const playOverlay = card.querySelector('.play-overlay');
+  playOverlay.addEventListener('click', () => {
+    loadAndPlayVideo(index);
+  });
+  videoElement.addEventListener('ended', () => {
+    playOverlay.innerHTML = `<svg class="play-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>`;
+  });
+  return card;
+}
+searchInput.addEventListener('input', e => {
+  filterVideos(e.target.value);
+});
+function filterVideos(searchTerm) {
+  const normalizedSearch = searchTerm.toLowerCase();
+  let hasResults = false;
+  allVideoCards.forEach(card => {
+    const videoTitle = card.querySelector('.video-title').textContent.toLowerCase();
+    if (videoTitle.includes(normalizedSearch)) {
+      card.style.display = 'block';
+      hasResults = true;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+  const existingNoResults = videoGrid.querySelector('.no-results');
+  if (existingNoResults) {
+    existingNoResults.remove();
+  }
+  if (!hasResults && searchTerm) {
+    const noResults = document.createElement('div');
+    noResults.className = 'no-results';
+    noResults.textContent = 'No videos found matching your search';
+    videoGrid.appendChild(noResults);
+  }
+}
+function renderVideoCards(videos) {
+  videoGrid.innerHTML = '';
+  allVideoCards = videos.map((video, index) => {
+    const card = createVideoCard(video, index);
+    videoGrid.appendChild(card);
+    return card;
+  });
+}
+function setupEventListeners() {
+  playPauseControl.addEventListener('click', togglePlayPause);
+  prevTrackButton.addEventListener('click', playPrevTrack);
+  nextTrackButton.addEventListener('click', playNextTrack);
+  shuffleButton.addEventListener('click', toggleShuffle);
+  autoplayToggle.addEventListener('click', toggleAutoplay);
+  volumeButton.addEventListener('click', toggleMute);
+  volumeSlider.addEventListener('input', setVolume);
+  progressBar.addEventListener('click', seekVideo);
+  progressHandle.addEventListener('mousedown', e => {
+    document.addEventListener('mousemove', dragHandle);
+    document.addEventListener('mouseup', stopDrag);
+  });
+  document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+}
+function loadAndPlayVideo(index) {
+  currentVideoIndex = index;
+  updateNowPlaying();
+  playCurrentVideo();
+  nowPlaying.style.display = 'flex';
+}
+function updateNowPlaying() {
+  const currentVideo = isShuffle ? shuffledVideoList[currentVideoIndex] : videoList[currentVideoIndex];
+  currentSongTitle.textContent = currentVideo.title;
+  nowPlayingThumbnail.innerHTML = `<video src="${currentVideo.path}" style="width: 100%; height: 100%; object-fit: cover;"></video>`;
+}
+function playCurrentVideo() {
+  if (currentVideoElement) {
+    currentVideoElement.pause();
+  }
+  currentVideoElement = nowPlayingThumbnail.querySelector('video');
+  if (currentVideoElement) {
+    currentVideoElement.play();
+    isPlaying = true;
+    updatePlayPauseIcon();
+    currentVideoElement.addEventListener('timeupdate', updateProgress);
+    currentVideoElement.addEventListener('ended', playNextOnEnd);
+  }
+}
+function pauseCurrentVideo() {
+  if (currentVideoElement && !currentVideoElement.paused) {
+    currentVideoElement.pause();
+    isPlaying = false;
+    updatePlayPauseIcon();
+  }
+}
+function togglePlayPause() {
+  if (!currentVideoElement) return;
+  if (isPlaying) {
+    pauseCurrentVideo();
+  } else {
+    playCurrentVideo();
+  }
+}
+function updatePlayPauseIcon() {
+  playPauseIcon.innerHTML = isPlaying ? '<path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z"/>' : '<path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/>';
+}
+function playPrevTrack() {
+  if (videoList.length === 0) return;
+  currentVideoIndex = (currentVideoIndex - 1 + videoList.length) % videoList.length;
+  updateNowPlaying();
+  playCurrentVideo();
+}
+function playNextTrack() {
+  if (videoList.length === 0) return;
+  currentVideoIndex = (currentVideoIndex + 1) % videoList.length;
+  updateNowPlaying();
+  playCurrentVideo();
+}
+function playNextOnEnd() {
+  if (isAutoplay) {
+    playNextTrack();
+  } else {
+    isPlaying = false;
+    updatePlayPauseIcon();
+  }
+}
+function updateProgress() {
+  if (currentVideoElement) {
+    const {
+      currentTime,
+      duration
+    } = currentVideoElement;
+    const progressPercent = currentTime / duration * 100;
+    progressFilled.style.width = `${progressPercent}%`;
+    progressHandle.style.left = `${progressPercent}%`;
+    timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+  }
+}
+function formatTime(time) {
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+  return `${minutes}:${seconds}`;
+}
+function seekVideo(e) {
+  if (!currentVideoElement) return;
+  const rect = progressBar.getBoundingClientRect();
+  const clickPosition = e.clientX - rect.left;
+  const totalWidth = rect.width;
+  const seekTime = clickPosition / totalWidth * currentVideoElement.duration;
+  currentVideoElement.currentTime = seekTime;
+}
+function dragHandle(e) {
+  if (!currentVideoElement) return;
+  const rect = progressBar.getBoundingClientRect();
+  const position = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+  const time = position / rect.width * currentVideoElement.duration;
+  currentVideoElement.currentTime = time;
+  updateProgress();
+}
+function stopDrag() {
+  document.removeEventListener('mousemove', dragHandle);
+  document.removeEventListener('mouseup', stopDrag);
+}
+function toggleMute() {
+  if (!currentVideoElement) return;
+  currentVideoElement.muted = !currentVideoElement.muted;
+  volumeButton.innerHTML = currentVideoElement.muted ? '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,12A1.5,1.5 0 0,1 15,10.5A1.5,1.5 0 0,1 16.5,9A1.5,1.5 0 0,1 18,10.5A1.5,1.5 0 0,1 16.5,12M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M9.97,5L7.59,6.39L9.18,8L6,8V16L9.18,16L7.59,17.61L9.97,19.03C9.5,19.2 9,19.04 8.66,18.66L5,15H3V9H5L8.66,5.34C9,4.96 9.5,4.8 9.97,5Z"/></svg>' : '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/></svg>';
+}
+function setVolume() {
+  if (currentVideoElement) {
+    currentVideoElement.volume = volumeSlider.value;
+  }
+}
+function toggleShuffle() {
+  isShuffle = !isShuffle;
+  shuffleButton.classList.toggle('active', isShuffle);
+  if (isShuffle) {
+    shuffledVideoList = [...videoList].sort(() => Math.random() - 0.5);
+  }
+}
+function toggleAutoplay() {
+  isAutoplay = !isAutoplay;
+  autoplayToggle.classList.toggle('active', isAutoplay);
+}
+function toggleTheme() {
+  const root = document.documentElement;
+  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', currentTheme);
+  const themeToggleIcon = document.querySelector('#theme-toggle svg');
+  if (currentTheme === 'dark') {
+    themeToggleIcon.innerHTML = '<path fill="currentColor" d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M3,9V15H7L12,20V4L7,9H3Z"/>';
+  } else {
+    themeToggleIcon.innerHTML = '<path fill="currentColor" d="M12,18C11.11,18 10.26,17.8 9.5,17.45C11.56,16.5 13,14.42 13,12C13,9.58 11.56,7.5 9.5,6.55C10.26,6.2 11.11,6 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z"/>';
+  }
+  localStorage.setItem('theme', currentTheme);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    currentTheme = savedTheme;
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    const themeToggleIcon = document.querySelector('#theme-toggle svg');
+    if (currentTheme === 'light') {
+      themeToggleIcon.innerHTML = '<path fill="currentColor" d="M12,18C11.11,18 10.26,17.8 9.5,17.45C11.56,16.5 13,14.42 13,12C13,9.58 11.56,7.5 9.5,6.55C10.26,6.2 11.11,6 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z"/>';
+    }
+  }
+  setupEventListeners();
+  renderVideoCards(videoList);
+  updateNowPlayingInfo();
+});
+function updateNowPlayingInfo() {
+  currentSongTitle.textContent = 'Nothing playing';
+  nowPlayingThumbnail.innerHTML = '';
+}</script>
 </body>
 </html>
