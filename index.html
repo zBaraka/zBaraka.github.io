@@ -112,7 +112,7 @@
       if (password === 'Angelobot28') {
         try {
           const timestamp = new Date().getTime();  // Erzeugt einen einzigartigen Timestamp
-          const response = await fetch(`https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/inselgruppe.html?${timestamp}`);
+          const response = await fetch(`https://raw.githubusercontent.com/zBaraka/eineselsingtauchgernemalsuppenteller/refs/heads/main/inselgruppe.html`);
           
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
