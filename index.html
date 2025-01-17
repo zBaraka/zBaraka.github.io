@@ -1,395 +1,164 @@
-<!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Musik Player</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f0f0f0;
-            margin: 0;
-        }
+  <base href="www.skybrute.de">
+  <link rel="icon" href="https://i.imgur.com/JP4qYpv.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Passwortgeschützte Seite</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #333, #555);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      color: #eee;
+    }
 
-        .player-container {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 90%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            touch-action: pan-y pinch-zoom; /* Enable swipe on mobile */
-        }
+    .container {
+      background-color: #222;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      animation: fadeIn 0.75s ease-out;
+      width: 80%;
+      max-width: 500px;
+    }
 
-        .thumbnail-container {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 15px;
-            background-color: #eee;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
 
-        .thumbnail {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-        .song-info {
-            text-align: center;
-            margin-bottom: 15px;
-        }
+    h1 {
+      color: #fff;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
 
-        .song-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+    p {
+      color: #ccc;
+      margin-bottom: 20px;
+    }
 
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
+    .input-group {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: stretch;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #666;
+    }
 
-        button {
-            background: none;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-        }
+    input[type="password"] {
+      flex-grow: 1;
+      padding: 12px 15px;
+      border: none;
+      font-size: 16px;
+      background-color: #444;
+      color: #eee;
+      border-radius: 8px 0 0 8px;
+      outline: none;
+      transition: background-color 0.2s ease-in-out;
+    }
 
-        input[type="range"] {
-            width: 100%;
-        }
+    input[type="password"]:focus {
+      background-color: #555;
+      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.5);
+    }
 
-        .song-list-container {
-            margin-top: 20px;
-            width: 100%;
-        }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 0 8px 8px 0;
+      transition: background-color 0.3s ease;
+    }
 
-        .song-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .song-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-
-        .song-item:last-child {
-            border-bottom: none;
-        }
-    </style>
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-    <div class="player-container">
-        <div class="thumbnail-container">
-            <img id="thumbnail" class="thumbnail" src="" alt="Song Thumbnail">
-        </div>
-        <div class="song-info">
-            <div id="song-title" class="song-title"></div>
-        </div>
-        <audio id="audio" style="width: 100%;"></audio>
-        <input type="range" id="progress" value="0">
-        <div class="controls">
-            <button id="prev-btn">⬅️</button>
-            <button id="play-pause-btn">▶️</button>
-            <button id="next-btn">➡️</button>
-        </div>
-        <div class="song-list-container">
-            <h3>Song Liste</h3>
-            <ul class="song-list" id="song-list">
-                </ul>
-        </div>
+  <div class="container">
+    <h1>Passwortgeschützte Seite</h1>
+    <p>Gib das Passwort ein, um Zugriff zu erhalten:</p>
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Passwort">
+      <button onclick="checkPassword()">Eingeben</button>
     </div>
+  </div>
 
-    <script>
-        const songs = [
-            {
-                title: 'Analfried Song',
-                thumbnail: 'https://i.imgur.com/rU8nXfL.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/analfried%20song.mp3'
-            }, {
-                title: 'Ave Natale',
-                thumbnail: 'https://i.imgur.com/vnL2rRQ.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Ave Natale.mp3'
-            }, {
-                title: 'Besgen im Haus',
-                thumbnail: 'https://i.imgur.com/LGY7Ugh.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Besgen_im_Haus.mp3'
-            }, {
-                title: 'Beste im Biz',
-                thumbnail: 'https://i.imgur.com/eRufmDB.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Beste_im_Biz.mp3'
-            }, {
-                title: 'Clyde gegen Rüdiger und Niko',
-                thumbnail: 'https://i.imgur.com/zaQVCSY.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Clyde_gegen_R_diger_und_Niko.mp3'
-            }, {
-                title: 'Der Größte und Tollste',
-                thumbnail: 'https://i.imgur.com/G3MRTe1.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/größte und tollste.m4a'
-            }, {
-                title: 'Deutschland GmbH',
-                thumbnail: 'https://i.imgur.com/JEGB6yf.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Deutschland_GmbH.mp3'
-            }, {
-                title: 'Die Schule ist ein Witz',
-                thumbnail: 'https://i.imgur.com/A98pl0L.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Die_Schule_ist_ein_Witz.mp3'
-            }, {
-                title: 'Disstrack gegen Berrewitz',
-                thumbnail: 'https://i.imgur.com/HOJbtsF.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Disstrack_gegen_Berrewitz.mp3'
-            }, {
-                title: 'Disstrack gegen Besgen',
-                thumbnail: 'https://i.imgur.com/0lgqrve.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Disstrack gegen Besgen.mp3'
-            }, {
-                title: 'Dual Shadows',
-                thumbnail: 'https://i.imgur.com/MVqqDkZ.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Dual_Shadows.mp3'
-            }, {
-                title: 'Eclipsed Horizions',
-                thumbnail: 'https://i.imgur.com/IIqcUAP.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Eclipsed_Horizions.mp3'
-            }, {
-                title: 'Fick die Schule',
-                thumbnail: 'https://i.imgur.com/AvyljGe.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Fick_die_Schule.mp3'
-            }, {
-                title: 'Fisch an Land',
-                thumbnail: 'https://i.imgur.com/VyblhJC.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Fisch_an_Land.mp3'
-            }, {
-                title: 'Granny Rap - In den alten Jahren',
-                thumbnail: 'https://i.imgur.com/qGC2chy.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Granny_Rap___In_den_alten_Jahren.mp3'
-            }, {
-                title: 'Große Namen große Worte',
-                thumbnail: 'https://cdn2.suno.ai/cbe38b4f-45bc-46b6-89d2-f295497b98a5_e6de5789.jpeg',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Große Namen%2C große Worte.mp3'
-            }, {
-                title: 'Hattig\'s Schäferhund',
-                thumbnail: 'https://i.imgur.com/i3D57cb.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Hattig_s_Sch_ferhund.mp3'
-            }, {
-                title: 'Inferno',
-                thumbnail: 'https://i.imgur.com/0ONzAdK.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Inferno.mp3'
-            }, {
-                title: 'Jüdisch ist normal',
-                thumbnail: 'https://i.imgur.com/phhCDUv.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/J_disch_ist_normal.mp3'
-            }, {
-                title: 'Kein Limit',
-                thumbnail: 'https://cdn2.suno.ai/8cb3993b-df74-4171-80a6-cbee2eae2d0e_c9c50a12.jpeg',
-                path: 'https://cdn1.suno.ai/8cb3993b-df74-4171-80a6-cbee2eae2d0e.mp3'
-            }, {
-                title: 'Kein Platz für Schwächlinge',
-                thumbnail: 'https://i.imgur.com/xpAQcEB.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Kein_Platz_f_r_Schw_chlinge.mp3'
-            }, {
-                title: 'Last View',
-                thumbnail: 'https://i.imgur.com/oo5HheM.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Last_View.mp3'
-            }, {
-                title: 'Mamadou Song',
-                thumbnail: 'https://cdn.discordapp.com/avatars/1278460402719657984/95ebbb1971361670a93f10d0fe49b246.png?size=1024&width=940&height=940',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Mamadou Song.mp3'
-            }, {
-                title: 'Whispers of a broken heart',
-                thumbnail: 'https://i.imgur.com/PYkgDtl.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Whispers_of_a_broken_heart.mp3'
-            }, {
-                title: 'Rüdiger Song',
-                thumbnail: 'https://i.imgur.com/jth0slY.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/R_diger_Song.mp3'
-            }, {
-                title: 'Niko durch die Gänge',
-                thumbnail: 'https://cdn.discordapp.com/avatars/1278455593044148254/a_4e8372b72b160d18c49b0f4bc897e49e.gif?size=4096',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Niko%20durch%20die%20g%C3%A4nge.mp3'
-            }, {
-                title: 'Rise Above',
-                thumbnail: 'https://i.imgur.com/TR7N0j2.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Rise_Above.mp3'
-            }, {
-                title: 'Rise from the Ruins',
-                thumbnail: 'https://i.imgur.com/CbbUryc.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Rise_from_the_Ruins.mp3'
-            }, {
-                title: 'Seck am Start',
-                thumbnail: 'https://i.imgur.com/9E90qRs.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Seck_am_Start.mp3'
-            }, {
-                title: 'Soundclash Remix',
-                thumbnail: 'https://i.imgur.com/nVK3uhP.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Soundclash_Remix.mp3'
-            }, {
-                title: 'Ihr Abschaum',
-                thumbnail: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Ihr%20Abschaum.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Ihr%20Abschaum.mp3'
-            }, {
-                title: 'Born in the Fire',
-                thumbnail: 'https://cdn2.suno.ai/image_large_32bcd2ed-b7cd-41b0-827c-8b8dba0e2465.jpeg',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Born in the Fire.mp3'
-            }, {
-                title: 'Adi gegen Niko',
-                thumbnail: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Adi%20gegen%20Niko.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Adi%20gegen%20Niko.mp3'
-            }, {
-                title: 'Alles Mist',
-                thumbnail: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Alles%20Mist.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Alles%20Mist.mp3'
-            }, {
-                title: 'Das Winni Schwein',
-                thumbnail: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Das%20Winni%20Schwein.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Das%20Winni%20Schwein.mp3'
-            }, {
-                title: 'Du Wicht',
-                thumbnail: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Du%20Wicht.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/HeyStan%20du%20wicht.mp3'
-            }, {
-                title: 'Monster in der Hose',
-                thumbnail: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Monster%20in%20der%20Hose.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Monster%20in%20der%20Hose.mp3'
-            }, {
-                title: 'Ich bin ein Soziopath',
-                thumbnail: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Mimon.jpg',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Ich%20bin%20ein%20Soziopath.mp3'
-            }, {
-                title: 'Maximal Disziplin',
-                thumbnail: 'https://cdn2.suno.ai/41bbce05-de29-40b3-96c0-c3d365de1286_d1866cad.jpeg',
-                path: 'https://cdn1.suno.ai/41bbce05-de29-40b3-96c0-c3d365de1286.mp3'
-            }, {
-                title: 'Analfried Frisst Niko',
-                thumbnail: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Analfried%20frisst%20Niko.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Analfried%20frisst%20Niko.mp3'
-            }, {
-                title: 'Wannabe Legends',
-                thumbnail: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Wannabe%20Legends.webp',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Wannabe_Legends.mp3'
-            }, {
-                        title: 'Schmitzgame Song',
-                thumbnail: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Schmitzgame%20Song.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@neogalaxis/Fixed_Schmitzgame.mp3'
-            }, {
-                title: 'Oh Clyde',
-                thumbnail: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@main/Oh%20Clyde.png',
-                path: 'https://cdn.jsdelivr.net/gh/zBaraka/eineselsingtauchgernemalsuppenteller@neogalaxis/Oh%20Clyde.mp3'
-            }
-        ];
+  <script>
+    async function checkPassword() {
+      const passwordInput = document.getElementById('password');
+      const password = passwordInput.value;
 
-        let currentSongIndex = 0;
-        const audio = document.getElementById('audio');
-        const thumbnail = document.getElementById('thumbnail');
-        const songTitle = document.getElementById('song-title');
-        const playPauseBtn = document.getElementById('play-pause-btn');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const progress = document.getElementById('progress');
-        const songListContainer = document.getElementById('song-list');
-
-        function loadSong(index) {
-            const song = songs[index];
-            thumbnail.src = song.thumbnail;
-            songTitle.textContent = song.title;
-            audio.src = song.path;
-            audio.load();
-            progress.value = 0;
+      if (password === 'Angelobot28') {
+        let targetUrl = '';
+        if (isMobile()) {
+          targetUrl = 'https://raw.githubusercontent.com/zBaraka/eineselsingtauchgernemalsuppenteller/refs/heads/main/mobile.html';
+        } else {
+          targetUrl = 'https://raw.githubusercontent.com/zBaraka/eineselsingtauchgernemalsuppenteller/refs/heads/main/inselgruppe.html';
         }
 
-        function playPause() {
-            if (audio.paused) {
-                audio.play();
-                playPauseBtn.textContent = '⏸️';
+        try {
+          const response = await fetch(targetUrl);
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const htmlText = await response.text();
+
+          document.documentElement.innerHTML = htmlText;
+
+          const scripts = document.querySelectorAll('script');
+          scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            Array.from(script.attributes).forEach(attribute => {
+              newScript.setAttribute(attribute.name, attribute.value);
+            });
+            newScript.textContent = script.textContent;
+            document.head.appendChild(newScript);
+          });
+
+          setTimeout(() => {
+            if (window.initializeMusicPlayer) {
+              window.initializeMusicPlayer();
             } else {
-                audio.pause();
-                playPauseBtn.textContent = '▶️';
+              console.error('initializeMusicPlayer function not found in loaded content.');
             }
+          }, 100);
+
+        } catch (error) {
+          console.error('Fehler beim Laden der externen Seite:', error);
+          alert('Fehler beim Laden des Inhalts. Bitte versuche es später noch einmal.');
         }
+      } else {
+        alert('Falsches Passwort!');
+        passwordInput.value = '';
+      }
+    }
 
-        function playSong(index) {
-            currentSongIndex = index;
-            loadSong(currentSongIndex);
-            audio.play();
-            playPauseBtn.textContent = '⏸️';
-        }
-
-        function nextSong() {
-            currentSongIndex = (currentSongIndex + 1) % songs.length;
-            loadSong(currentSongIndex);
-            audio.play();
-            playPauseBtn.textContent = '⏸️';
-        }
-
-        function prevSong() {
-            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
-            loadSong(currentSongIndex);
-            audio.play();
-            playPauseBtn.textContent = '⏸️';
-        }
-
-        playPauseBtn.addEventListener('click', playPause);
-        prevBtn.addEventListener('click', prevSong);
-        nextBtn.addEventListener('click', nextSong);
-
-        audio.addEventListener('ended', nextSong);
-
-        audio.addEventListener('timeupdate', () => {
-            if (audio.duration) {
-                progress.value = (audio.currentTime / audio.duration) * 100;
-            }
-        });
-
-        progress.addEventListener('input', () => {
-            audio.currentTime = (progress.value / 100) * audio.duration;
-        });
-
-        // Swipe functionality
-        let touchStartX = 0;
-        playerContainer.addEventListener('touchstart', (e) => {
-            touchStartX = e.touches[0].clientX;
-        });
-
-        playerContainer.addEventListener('touchend', (e) => {
-            const touchEndX = e.changedTouches[0].clientX;
-            const swipeDistance = touchEndX - touchStartX;
-
-            if (swipeDistance > 50) { // Swipe right
-                prevSong();
-            } else if (swipeDistance < -50) { // Swipe left
-                nextSong();
-            }
-        });
-
-        // Populate song list
-        songs.forEach((song, index) => {
-            const listItem = document.createElement('li');
-            listItem.classList.add('song-item');
-            listItem.textContent = song.title;
-            listItem.addEventListener('click', () => playSong(index));
-            songListContainer.appendChild(listItem);
-        });
-
-        // Load the first song initially
-        loadSong(currentSongIndex);
-    </script>
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+  </script>
 </body>
 </html>
