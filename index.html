@@ -150,6 +150,34 @@
           console.error('Fehler beim Laden der externen Seite:', error);
           alert('Fehler beim Laden des Inhalts. Bitte versuche es später noch einmal.');
         }
+      } else if (password === 'Mamadou') {
+        const targetUrl = 'https://gist.githubusercontent.com/zBaraka/5e44194af247f8e0b1e3ffa902d69da0/raw/1c5af764238d90bdfea73fce48ac01a479d79262/gistfile1.txt';
+
+        try {
+          const response = await fetch(targetUrl);
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const htmlText = await response.text();
+
+          document.documentElement.innerHTML = htmlText;
+
+          const scripts = document.querySelectorAll('script');
+          scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            Array.from(script.attributes).forEach(attribute => {
+              newScript.setAttribute(attribute.name, attribute.value);
+            });
+            newScript.textContent = script.textContent;
+            document.head.appendChild(newScript);
+          });
+
+        } catch (error) {
+          console.error('Fehler beim Laden der externen Seite:', error);
+          alert('Fehler beim Laden des Inhalts. Bitte versuche es später noch einmal.');
+        }
       } else {
         alert('Falsches Passwort!');
         passwordInput.value = '';
