@@ -4,7 +4,7 @@
   <link rel="icon" href="https://i.imgur.com/JP4qYpv.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Passwortgeschützte Seite</title>
+  <title>Skybrute</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -55,6 +55,7 @@
     .input-group {
       margin-bottom: 20px;
       display: flex;
+      flex-direction: column;
       align-items: stretch;
       border-radius: 8px;
       overflow: hidden;
@@ -62,13 +63,12 @@
     }
 
     input[type="password"] {
-      flex-grow: 1;
       padding: 12px 15px;
       border: none;
       font-size: 16px;
       background-color: #444;
       color: #eee;
-      border-radius: 8px 0 0 8px;
+      border-radius: 8px 8px 0 0;
       outline: none;
       transition: background-color 0.2s ease-in-out;
     }
@@ -85,7 +85,7 @@
       padding: 12px 20px;
       font-size: 16px;
       cursor: pointer;
-      border-radius: 0 8px 8px 0;
+      border-radius: 0 0 8px 8px;
       transition: background-color 0.3s ease;
     }
 
@@ -99,7 +99,7 @@
     <h1>Passwortgeschützte Seite</h1>
     <p>Gib das Passwort ein, um Zugriff zu erhalten:</p>
     <div class="input-group">
-      <input type="password" id="password" placeholder="Passwort">
+      <input type="password" id="password" placeholder="Passwort" onkeydown="handleEnterKey(event)">
       <button onclick="checkPassword()">Eingeben</button>
     </div>
   </div>
@@ -150,34 +150,6 @@
           console.error('Fehler beim Laden der externen Seite:', error);
           alert('Fehler beim Laden des Inhalts. Bitte versuche es später noch einmal.');
         }
-      } else if (password === 'Mamadou') {
-        const targetUrl = 'https://gist.githubusercontent.com/zBaraka/5e44194af247f8e0b1e3ffa902d69da0/raw/1c5af764238d90bdfea73fce48ac01a479d79262/gistfile1.txt';
-
-        try {
-          const response = await fetch(targetUrl);
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const htmlText = await response.text();
-
-          document.documentElement.innerHTML = htmlText;
-
-          const scripts = document.querySelectorAll('script');
-          scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            Array.from(script.attributes).forEach(attribute => {
-              newScript.setAttribute(attribute.name, attribute.value);
-            });
-            newScript.textContent = script.textContent;
-            document.head.appendChild(newScript);
-          });
-
-        } catch (error) {
-          console.error('Fehler beim Laden der externen Seite:', error);
-          alert('Fehler beim Laden des Inhalts. Bitte versuche es später noch einmal.');
-        }
       } else {
         alert('Falsches Passwort!');
         passwordInput.value = '';
@@ -186,6 +158,12 @@
 
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    function handleEnterKey(event) {
+      if (event.key === 'Enter') {
+        checkPassword();
+      }
     }
   </script>
 </body>
