@@ -34,7 +34,6 @@
         opacity: 0;
         transform: translateY(-20px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
@@ -78,6 +77,11 @@
       box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.5);
     }
 
+    .button-group {
+      display: flex;
+      gap: 5px;
+    }
+
     button {
       background-color: #007bff;
       color: white;
@@ -85,12 +89,21 @@
       padding: 12px 20px;
       font-size: 16px;
       cursor: pointer;
-      border-radius: 0 0 8px 8px;
       transition: background-color 0.3s ease;
+      flex: 1;
     }
 
     button:hover {
       background-color: #0056b3;
+    }
+
+    /* Red button style for Imagegenerator */
+    .red-button {
+      background-color: #dc3545;
+    }
+    
+    .red-button:hover {
+      background-color: #a71d2a;
     }
   </style>
 </head>
@@ -100,11 +113,47 @@
     <p>Gib das Passwort ein, um Zugriff zu erhalten:</p>
     <div class="input-group">
       <input type="password" id="password" placeholder="Passwort" onkeydown="handleEnterKey(event)">
-      <button onclick="checkPassword()">Eingeben</button>
+      <div class="button-group">
+        <button onclick="checkPassword()">Eingeben</button>
+        <button class="red-button" onclick="checkImageGen()">Zu Imagegenerator</button>
+      </div>
     </div>
   </div>
 
   <script>
+    async function loadExternalContent(targetUrl) {
+      try {
+        const response = await fetch(targetUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const htmlText = await response.text();
+        document.documentElement.innerHTML = htmlText;
+
+        // Re-evaluate scripts in the loaded content.
+        const scripts = document.querySelectorAll('script');
+        scripts.forEach(script => {
+          const newScript = document.createElement('script');
+          Array.from(script.attributes).forEach(attribute => {
+            newScript.setAttribute(attribute.name, attribute.value);
+          });
+          newScript.textContent = script.textContent;
+          document.head.appendChild(newScript);
+        });
+
+        setTimeout(() => {
+          if (window.initializeMusicPlayer) {
+            window.initializeMusicPlayer();
+          } else {
+            console.error('initializeMusicPlayer function not found in loaded content.');
+          }
+        }, 100);
+      } catch (error) {
+        console.error('Fehler beim Laden der externen Seite:', error);
+        alert('Fehler beim Laden des Inhalts. Bitte versuche es später noch einmal.');
+      }
+    }
+
     async function checkPassword() {
       const passwordInput = document.getElementById('password');
       const password = passwordInput.value;
@@ -116,40 +165,20 @@
         } else {
           targetUrl = 'https://raw.githubusercontent.com/zBaraka/eineselsingtauchgernemalsuppenteller/refs/heads/main/inselgruppe.html';
         }
+        await loadExternalContent(targetUrl);
+      } else {
+        alert('Falsches Passwort!');
+        passwordInput.value = '';
+      }
+    }
 
-        try {
-          const response = await fetch(targetUrl);
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const htmlText = await response.text();
-
-          document.documentElement.innerHTML = htmlText;
-
-          const scripts = document.querySelectorAll('script');
-          scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            Array.from(script.attributes).forEach(attribute => {
-              newScript.setAttribute(attribute.name, attribute.value);
-            });
-            newScript.textContent = script.textContent;
-            document.head.appendChild(newScript);
-          });
-
-          setTimeout(() => {
-            if (window.initializeMusicPlayer) {
-              window.initializeMusicPlayer();
-            } else {
-              console.error('initializeMusicPlayer function not found in loaded content.');
-            }
-          }, 100);
-
-        } catch (error) {
-          console.error('Fehler beim Laden der externen Seite:', error);
-          alert('Fehler beim Laden des Inhalts. Bitte versuche es später noch einmal.');
-        }
+    async function checkImageGen() {
+      const passwordInput = document.getElementById('password');
+      const password = passwordInput.value;
+      // Passwort prüfen, gleiche Sicherheitsabfrage wie bei checkPassword
+      if (password === 'Angelobot28') {
+        const targetUrl = 'https://raw.githubusercontent.com/zBaraka/zBaraka.github.io/refs/heads/main/web.html';
+        await loadExternalContent(targetUrl);
       } else {
         alert('Falsches Passwort!');
         passwordInput.value = '';
@@ -162,6 +191,7 @@
 
     function handleEnterKey(event) {
       if (event.key === 'Enter') {
+        // Standardmäßig den blauen Button (Eingeben) auslösen.
         checkPassword();
       }
     }
