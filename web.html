@@ -1,1190 +1,202 @@
-<html>
-<head>
-  <base href="https://image.pollinations.ai/">
-  <title>Free Image Generator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #1a1a1a;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    body.light-mode {
-      background-color: #f0f0f0;
-      color: #1a1a1a;
-    }
-    .container {
-      max-width: 100%;
-      margin: 0;
-      padding: 20px;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .main {
-      display: flex;
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-    .sidebar {
-      width: 300px;
-      padding-right: 20px;
-    }
-    .content {
-      flex-grow: 1;
-    }
-    .input-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    input[type="text"], select, input[type="number"] {
-      width: 100%;
-      padding: 8px;
-      border-radius: 4px;
-      border: 1px solid #444;
-      background-color: #333;
-      color: #fff;
-    }
-    body.light-mode input[type="text"],
-    body.light-mode select,
-    body.light-mode input[type="number"] {
-      background-color: #e0e0e0;
-      color: #1a1a1a;
-      border-color: #ccc;
-    }
-    button {
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    body.light-mode button {
-      background-color: #4CAF50;
-      color: #fff;
-    }
-    body.light-mode button:hover {
-      background-color: #45a049;
-    }
-    #spamButton {
-      background-color: #4CAF50;
-    }
-    #spamButton.active {
-      background-color: #ff0000;
-      color: white;
-    }
-    #clearGalleryButton {
-      background-color: #ff0000;
-      color: white;
-    }
-    #clearGalleryButton:hover {
-      background-color: #cc0000;
-    }
-    .image-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .image-item {
-      position: relative;
-      background-color: #2a2a2a;
-      border-radius: 4px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    body.light-mode .image-item {
-      background-color: #e0e0e0;
-    }
-    .image-item img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-    .image-item .remove-btn {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background-color: rgba(255, 0, 0, 0.7);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .image-item .regenerate-btn {
-      position: absolute;
-      top: 5px;
-      left: 50%;
-      transform: translateX(-50%);
-        background-color: rgba(0, 100, 0, 0.7);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .image-item .download-btn {
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      background-color: rgba(0, 0, 255, 0.7);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .image-info {
-      padding: 10px;
-      font-size: 12px;
-      transition: color 0.3s ease;
-    }
-    body.light-mode .image-info {
-      color: #1a1a1a;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.9);
-    }
-    .modal-content {
-      margin: auto;
-      display: block;
-      width: 80%;
-      max-width: 700px;
-      max-height: 80%;
-      object-fit: contain;
-    }
-    .close {
-      position: absolute;
-      top: 15px;
-      right: 35px;
-      color: #f1f1f1;
-      font-size: 40px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .fullscreen-image {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    .status-message {
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 4px;
-    }
-    .prompt-display {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background-color: rgba(0, 0, 0, 0.5);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 4px;
-      max-width: 80%;
-      max-height: 60px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-    .nav-buttons {
-      position: absolute;
-      bottom: 70px;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: space-between;
-      padding: 0 35px;
-    }
-    .nav-buttons button {
-      background-color: rgba(0, 0, 0, 0.5);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    .nav-buttons button:hover {
-      background-color: rgba(0, 0, 0, 0.7);
-    }
-    .prompt-history {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      width: 100%;
-      background-color: #333;
-      border: 1px solid #444;
-      border-top: none;
-      border-radius: 0 0 4px 4px;
-      max-height: 150px;
-      overflow-y: auto;
-      display: none;
-      z-index: 100;
-    }
-    .prompt-history div {
-      padding: 8px;
-      cursor: pointer;
-    }
-    .prompt-history div:hover {
-      background-color: #444;
-    }
-    .warning-modal {
-      display: none;
-      position: fixed;
-      z-index: 1001;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-    }
-    .warning-content {
-      background-color: #2a2a2a;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 300px;
-      border-radius: 5px;
-      text-align: center;
-      transition: background-color 0.3s ease;
-    }
-    body.light-mode .warning-content {
-      background-color: #e0e0e0;
-      color: #1a1a1a;
-    }
-    .warning-buttons {
-      margin-top: 20px;
-    }
-    .warning-buttons button {
-      margin: 0 10px;
-      padding: 5px 15px;
-      width: auto;
-    }
-    .seed-input {
-      position: absolute;
-      top: 60px;
-      left: 10px;
-      background-color: rgba(0, 0, 0, 0.5);
-      color: white;
-      padding: 5px;
-      border-radius: 4px;
-    }
-    .seed-input input {
-      width: 100px;
-      margin-left: 5px;
-    }
-    #openInNewWindow {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background-color: rgba(0, 0, 0, 0.5);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .custom-resolution {
-      display: block;
-    }
-    .theme-toggle {
-      position: absolute;
-      bottom: 10px;
-      right: 20px;
-      cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .theme-toggle .sun {
-      display: none;
-        font-size: 2em;
-    }
-    .theme-toggle .moon {
-      display: block;
-        font-size: 2em;
-    }
-    body.light-mode .theme-toggle .sun {
-      display: block;
-    }
-    body.light-mode .theme-toggle .moon {
-        display: none;
-    }
-    .ai-prompt-container {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .ai-prompt-container input[type="checkbox"] {
-      margin-right: 10px;
-      cursor: pointer;
-    }
-    .ai-prompt-input-group {
-        display: none;
-    }
-    .ai-prompt-input-group.active {
-        display: block;
-    }
-    .ai-prompt-input-group #aiPrompt {
-        width: 100%;
-        padding: 8px;
-        border-radius: 4px;
-        border: 1px solid #444;
-        background-color: #333;
-        color: #fff;
-    }
-    body.light-mode .ai-prompt-input-group #aiPrompt {
-      background-color: #e0e0e0;
-      color: #1a1a1a;
-      border-color: #ccc;
-    }
-     #regenerateSeed {
-      background-color: rgba(0, 0, 0, 0.5);
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-      border-radius: 4px;
-       position: absolute;
-      top: 80px;
-      left: 10px;
-    }
-    .enhance-quality-container {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    .enhance-quality-container input[type="checkbox"] {
-        margin-right: 10px;
-    }
-    .header-container {
-      display: flex;
-      align-items: center;
-      width: 100%;
-    }
-    .prompt-container {
-        flex-grow: 1;
-        padding-left: 20px;
-        position: relative;
-    }
-    .generating-message {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      background-color: green;
-      color: white;
-      padding: 10px 15px;
-      border-radius: 4px;
-      font-weight: bold;
-      display: none;
-       animation: flashing 1s linear infinite;
-    }
-    @keyframes flashing {
-        0% { opacity: 1; }
-        50% { opacity: 0.2; }
-        100% { opacity: 1; }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header class="header">
-     <div class="header-container">
-          <div class="logo">Free Image Generator</div>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Free Image Generator</title>
+    <link rel="icon" type="image/png" href="https://i.imgur.com/JP4qYpv.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="header-container">
+          <div class="logo">
+            <img src="https://i.imgur.com/JP4qYpv.png" alt="Image Generator Logo" />
+          </div>
           <div class="prompt-container">
-            <div style="position: relative;">
-              <input type="text" id="prompt" placeholder="Enter your prompt here" autocomplete="off">
-            </div>
-            <div style="position: relative;">
-                <div class="ai-prompt-input-group">
-                  <input type="text" id="aiPrompt" placeholder="Enter your prompt for AI enhancement here" autocomplete="off">
-                </div>
+            <input type="text" id="prompt" placeholder="Enter your prompt here" autocomplete="off" />
+            <div class="ai-prompt-input-group">
+              <input
+                type="text"
+                id="aiPrompt"
+                placeholder="Enter your prompt for AI enhancement here"
+                autocomplete="off"
+              />
             </div>
           </div>
+        </div>
+        <div class="generating-message" id="generatingMessage">Generating...</div>
+      </header>
+      <main class="main">
+        <aside class="sidebar">
+          <form id="generate-form">
+            <div class="ai-prompt-container">
+              <input type="checkbox" id="useAiPrompt" />
+              <label for="useAiPrompt">Enhance prompt with AI</label>
+            </div>
+            <div class="input-group ai-prompt-input-group">
+              <label for="tone">AI Tone:</label>
+              <select id="tone">
+                <option value="Narrative">Narrative</option>
+                <option value="Informative">Informative</option>
+                <option value="Descriptive">Descriptive</option>
+                <option value="Humorous">Humorous</option>
+                <option value="Inspirational">Inspirational</option>
+                <option value="Objective">Objective</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="style">Art Style:</label>
+              <select id="style">
+                <option value="None">None</option>
+                <option value="2D Anime">2D Anime</option>
+                <option value="2D Cartoon">2D Cartoon</option>
+                <option value="2D Manga">2D Manga</option>
+                <option value="3D">3D</option>
+                <option value="70s">70s</option>
+                <option value="80s">80s</option>
+                <option value="80s Anime">80s Anime</option>
+                <option value="80s Cartoon">80s Cartoon</option>
+                <option value="90s Anime">90s Anime</option>
+                <option value="90s Cartoon">90s Cartoon</option>
+                <option value="Abstract">Abstract</option>
+                <option value="Anime">Anime</option>
+                <option value="Art Deco">Art Deco</option>
+                <option value="Baroque">Baroque</option>
+                <option value="Cartoon">Cartoon</option>
+                <option value="CGI">CGI</option>
+                <option value="CGI Cartoon">CGI Cartoon</option>
+                <option value="Chibi">Chibi</option>
+                <option value="Cinematic">Cinematic</option>
+                <option value="Cinematic Horror">Cinematic Horror</option>
+                <option value="Classic Disney">Classic Disney</option>
+                <option value="Classic Hanna-Barbera">Classic Hanna-Barbera</option>
+                <option value="Claymation">Claymation</option>
+                <option value="Comic Book">Comic Book</option>
+                <option value="Creepy">Creepy</option>
+                <option value="Cubism">Cubism</option>
+                <option value="Cyberpunk">Cyberpunk</option>
+                <option value="Dadaism">Dadaism</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Futuristic">Futuristic</option>
+                <option value="Glow in the Dark">Glow in the Dark</option>
+                <option value="Gothic">Gothic</option>
+                <option value="Hentai">Hentai</option>
+                <option value="Hyper-Realistic">Hyper-Realistic</option>
+                <option value="Impressionism">Impressionism</option>
+                <option value="Low Poly">Low Poly</option>
+                <option value="Manga">Manga</option>
+                <option value="Mangaka">Mangaka</option>
+                <option value="Midjourney">Midjourney</option>
+                <option value="Minimalist">Minimalist</option>
+                <option value="Neon LED Light">Neon LED Light</option>
+                <option value="Oil Painting">Oil Painting</option>
+                <option value="Old Cartoon 30s">Old Cartoon 30s</option>
+                <option value="Origami">Origami</option>
+                <option value="Pixar">Pixar</option>
+                <option value="Pop Art">Pop Art</option>
+                <option value="Post-Apocalyptic">Post-Apocalyptic</option>
+                <option value="Retro">Retro</option>
+                <option value="Retro Anime">Retro Anime</option>
+                <option value="Science Fiction">Science Fiction</option>
+                <option value="Sketch">Sketch</option>
+                <option value="Steampunk">Steampunk</option>
+                <option value="Street Art">Street Art</option>
+                <option value="Surreal">Surreal</option>
+                <option value="Ukiyo-e">Ukiyo-e</option>
+                <option value="Vaporwave">Vaporwave</option>
+                <option value="Vintage">Vintage</option>
+                <option value="Watercolor">Watercolor</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="model">Model:</label>
+              <select id="model">
+                <option value="flux">FLUX (Default)</option>
+                <option value="flux-realism">FLUX Realism</option>
+                <option value="flux-anime">FLUX Anime</option>
+                <option value="flux-3d">FLUX 3D</option>
+                <option value="flux-cablyai">FLUX CablyAI</option>
+                <option value="flux-pro">FLUX Pro</option>
+                <option value="turbo">Turbo</option>
+              </select>
+            </div>
+            <div class="enhance-quality-container">
+              <input type="checkbox" id="enhanceQuality" />
+              <label for="enhanceQuality">Enhance Quality</label>
+            </div>
+            <div class="input-group">
+              <label for="aspect-ratio">Aspect Ratio:</label>
+              <select id="aspect-ratio">
+                <option value="1:1">1:1 Square</option>
+                <option value="16:9">16:9 Landscape</option>
+                <option value="9:16">9:16 Portrait</option>
+                <option value="4:3">4:3 Standard</option>
+              </select>
+            </div>
+            <div class="custom-resolution">
+              <div class="input-group">
+                <label for="custom-width">Width:</label>
+                <input type="number" id="custom-width" min="1" value="1024" />
+              </div>
+              <div class="input-group">
+                <label for="custom-height">Height:</label>
+                <input type="number" id="custom-height" min="1" value="1024" />
+              </div>
+            </div>
+            <div class="input-group">
+              <label for="num-images">Images Quantity:</label>
+              <input type="number" id="num-images" min="1" max="10" value="4" />
+            </div>
+            <div class="input-group">
+              <label for="seed">Seed (0 for random):</label>
+              <input type="number" id="seed" min="0" value="0" />
+            </div>
+            <button type="submit" id="generate-btn">Generate Image</button>
+            <button type="button" id="clearGalleryButton">Clear Gallery</button>
+          </form>
+        </aside>
+        <section class="content">
+          <div id="image-grid" class="image-grid"></div>
+        </section>
+      </main>
+    </div>
+    <div id="imageModal" class="modal">
+      <span class="close">×</span>
+      <img class="modal-content" id="modalImage" />
+      <div class="nav-buttons">
+        <button id="prevImage"><i class="fas fa-arrow-left"></i> Previous</button>
+        <button id="nextImage">Next <i class="fas fa-arrow-right"></i></button>
       </div>
-      <div class="generating-message" id="generatingMessage">Generating...</div>
-    </header>
-    <main class="main">
-      <aside class="sidebar">
-        <div></div>
-        <form id="generate-form">
-          <div class="ai-prompt-container">
-              <input type="checkbox" id="useAiPrompt">
-              <label for="useAiPrompt">Automatically enhance prompt using AI</label>
-          </div>
-           <div class="input-group ai-prompt-input-group">
-              <label for="tone">Tone:</label>
-               <select id="tone">
-                 <option value="Narrative">Narrative</option>
-                 <option value="Informative">Informative</option>
-                 <option value="Descriptive">Descriptive</option>
-                 <option value="Humorous">Humorous</option>
-                 <option value="Inspirational">Inspirational</option>
-                 <option value="Objective">Objective</option>
-               </select>
-            </div>
-            <div class="input-group">
-                <label for="style">Style:</label>
-                <select id="style">
-                    <option value="None">None</option>
-                    <option value="2D Anime">2D Anime</option>
-                    <option value="2D Cartoon">2D Cartoon</option>
-                    <option value="2D Manga">2D Manga</option>
-                    <option value="3D">3D</option>
-                    <option value="70s">70s</option>
-                    <option value="80s">80s</option>
-                    <option value="80s Anime">80s Anime</option>
-                    <option value="80s Cartoon">80s Cartoon</option>
-                    <option value="90s Anime">90s Anime</option>
-                    <option value="90s Cartoon">90s Cartoon</option>
-                    <option value="Abstract">Abstract</option>
-                    <option value="Anime">Anime</option>
-                    <option value="Art Deco">Art Deco</option>
-                    <option value="Baroque">Baroque</option>
-                    <option value="Cartoon">Cartoon</option>
-                    <option value="CGI">CGI</option>
-                    <option value="CGI Cartoon">CGI Cartoon</option>
-                    <option value="Chibi">Chibi</option>
-                     <option value="Cinematic">Cinematic</option>
-                     <option value="Cinematic Horror">Cinematic Horror</option>
-                      <option value="Classic Disney">Classic Disney</option>
-                     <option value="Classic Hanna-Barbera">Classic Hanna-Barbera</option>
-                     <option value="Claymation">Claymation</option>
-                    <option value="Comic Book">Comic Book</option>
-                    <option value="Creepy">Creepy</option>
-                    <option value="Cubism">Cubism</option>
-                    <option value="Cyberpunk">Cyberpunk</option>
-                     <option value="Dadaism">Dadaism</option>
-                    <option value="Fantasy">Fantasy</option>
-                    <option value="Futuristic">Futuristic</option>
-                    <option value="Glow in the Dark">Glow in the Dark</option>
-                    <option value="Gothic">Gothic</option>
-                    <option value="Hentai">Hentai</option>
-                    <option value="Hyper-Realistic">Hyper-Realistic</option>
-                    <option value="Impressionism">Impressionism</option>
-                    <option value="Low Poly">Low Poly</option>
-                    <option value="Manga">Manga</option>
-                    <option value="Mangaka">Mangaka</option>
-                    <option value="Midjourney">Midjourney</option>
-                    <option value="Minimalist">Minimalist</option>
-                    <option value="Neon LED Light">Neon LED Light</option>
-                    <option value="Oil Painting">Oil Painting</option>
-                    <option value="Old Cartoon 30s">Old Cartoon 30s</option>
-                    <option value="Origami">Origami</option>
-                    <option value="Pixar">Pixar</option>
-                    <option value="Pop Art">Pop Art</option>
-                    <option value="Post-Apocalyptic">Post-Apocalyptic</option>
-                    <option value="Retro">Retro</option>
-                    <option value="Retro Anime">Retro Anime</option>
-                    <option value="Science Fiction">Science Fiction</option>
-                     <option value="Sketch">Sketch</option>
-                    <option value="Steampunk">Steampunk</option>
-                    <option value="Street Art">Street Art</option>
-                     <option value="Surreal">Surreal</option>
-                     <option value="Ukiyo-e">Ukiyo-e</option>
-                    <option value="Vaporwave">Vaporwave</option>
-                     <option value="Vintage">Vintage</option>
-                    <option value="Watercolor">Watercolor</option>
-                </select>
-            </div>
-          <div class="input-group">
-            <label for="model">Model:</label>
-            <select id="model">
-              <option value="flux">FLUX (Default)</option>
-              <option value="flux-realism">FLUX Realism</option>
-              <option value="flux-anime">FLUX Anime</option>
-              <option value="flux-3d">FLUX 3D</option>
-              <option value="flux-cablyai">FLUX CablyAI</option>
-              <option value="flux-pro">FLUX Pro</option>
-              <option value="turbo">Turbo</option>
-            </select>
-          </div>
-           <div class="enhance-quality-container">
-                <input type="checkbox" id="enhanceQuality">
-                <label for="enhanceQuality">Enhance image details and quality</label>
-            </div>
-          <div class="input-group">
-            <label for="aspect-ratio">Aspect Ratio:</label>
-            <select id="aspect-ratio">
-              <option value="1:1">1:1 Square</option>
-              <option value="16:9">16:9 Landscape</option>
-              <option value="9:16">9:16 Portrait</option>
-              <option value="4:3">4:3 Standard</option>
-            </select>
-          </div>
-          <div class="custom-resolution">
-            <div class="input-group">
-              <label for="custom-width">Width:</label>
-              <input type="number" id="custom-width" min="1" value="1024">
-            </div>
-            <div class="input-group">
-              <label for="custom-height">Height:</label>
-              <input type="number" id="custom-height" min="1" value="1024">
-            </div>
-          </div>
-          <div class="input-group">
-            <label for="num-images">Number of Images:</label>
-            <input type="number" id="num-images" min="1" max="10" value="4">
-          </div>
-          <div class="input-group">
-            <label for="seed">Seed (0 for random):</label>
-            <input type="number" id="seed" min="0" value="0">
-          </div>
-          <button type="submit" id="generate-btn">Generate</button>
-          <button type="button" id="spamButton">Spam Generation</button>
-          <button type="button" id="clearGalleryButton">Clear Gallery</button>
-        </form>
-      </aside>
-      <section class="content">
-        <div id="image-grid" class="image-grid"></div>
-      </section>
-    </main>
-  </div>
-  <div id="imageModal" class="modal">
-    <span class="close">×</span>
-    <img class="modal-content" id="modalImage">
-    <div class="nav-buttons">
-      <button id="prevImage">&lt; Previous</button>
-      <button id="nextImage">Next &gt;</button>
-    </div>
-    <button id="openInNewWindow">Open Image in New Window</button>
-    <div class="prompt-display" id="promptDisplay"></div>
-    <div class="seed-input">
-      <label for="modalSeed">Seed:</label>
-      <input type="number" id="modalSeed" min="0" value="0">
-      <button id="regenerateSeed">Regenerate</button>
-    </div>
-  </div>
-  <div id="warningModal" class="warning-modal">
-    <div class="warning-content">
-      <h2>Warning</h2>
-      <p>Are you sure you want to clear the gallery? This action cannot be undone.</p>
-      <div class="warning-buttons">
-        <button id="confirmClear">Yes, Clear</button>
-        <button id="cancelClear">Cancel</button>
+      <button id="openInNewWindow"><i class="fas fa-external-link-alt"></i>
+        Open in New Window</button>
+      <div class="prompt-display" id="promptDisplay"></div>
+      <div class="seed-input">
+        <label for="modalSeed">Seed:</label>
+        <input type="number" id="modalSeed" min="0" value="0" />
+        <button id="regenerateSeed"><i class="fas fa-sync-alt"></i> Regenerate</button>
       </div>
     </div>
-  </div>
-  <div class="theme-toggle" id="themeToggle">
-      <span class="sun">☀️</span>
-      <span class="moon">🌙</span>
-  </div>
-  <script>
-    let imageCache = [];
-    let currentImageIndex = 0;
-    let isFullscreen = false;
-    let isSpamming = false;
-    let spamInterval;
-    let promptHistory = [];
-    let aiPromptHistory = [];
-    let isDarkMode = true;
-    let usingAiPrompt = false;
-    let enhanceQuality = false;
-    let currentHistoryIndex = -1;
-    let currentAiHistoryIndex = -1;
-    let isGenerating = false;
-
-    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
-    function toggleTheme() {
-      isDarkMode = !isDarkMode;
-      document.body.classList.toggle('light-mode', !isDarkMode);
-      localStorage.setItem('darkMode', isDarkMode);
-      updateThemeIcon();
-    }
-
-    function applyTheme() {
-      const storedMode = localStorage.getItem('darkMode');
-      if (storedMode) {
-        isDarkMode = storedMode === 'true';
-        document.body.classList.toggle('light-mode', !isDarkMode);
-      }
-      updateThemeIcon();
-    }
-
-    function updateThemeIcon() {
-      const themeToggle = document.getElementById('themeToggle');
-      themeToggle.querySelector('.sun').style.display = isDarkMode ? 'none' : 'block';
-      themeToggle.querySelector('.moon').style.display = isDarkMode ? 'block' : 'none';
-    }
-    document.addEventListener('DOMContentLoaded', applyTheme);
-
-    document.getElementById('generate-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      generateImages();
-    });
-
-    const promptInput = document.getElementById('prompt');
-    const aiPromptInput = document.getElementById('aiPrompt');
-
-    function updatePromptHistory(inputElement, historyElementId, historyArray) {
-    }
-    document.addEventListener('click', function(event) {
-    });
-
-    function handleHistoryNavigation(event, inputElement, historyElementId, historyArray) {
-    }
-
-    document.getElementById('prompt').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        generateImages();
-      }
-    });
-
-    document.getElementById('aiPrompt').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        generateImages();
-      }
-    });
-
-    document.getElementById('spamButton').addEventListener('click', function() {
-      if (isSpamming) {
-        stopSpamming();
-      } else {
-        startSpamming();
-      }
-    });
-
-    document.getElementById('clearGalleryButton').addEventListener('click', function() {
-      document.getElementById('warningModal').style.display = 'block';
-    });
-
-    document.getElementById('confirmClear').addEventListener('click', function() {
-      clearGallery();
-      document.getElementById('warningModal').style.display = 'none';
-    });
-
-    document.getElementById('cancelClear').addEventListener('click', function() {
-      document.getElementById('warningModal').style.display = 'none';
-    });
-
-    function startSpamming() {
-      isSpamming = true;
-      document.getElementById('spamButton').textContent = 'Stop Spamming';
-      document.getElementById('spamButton').classList.add('active');
-      spamInterval = setInterval(generateImages, 1000);
-    }
-
-    function stopSpamming() {
-      isSpamming = false;
-      document.getElementById('spamButton').textContent = 'Spam Generation';
-      document.getElementById('spamButton').classList.remove('active');
-      clearInterval(spamInterval);
-    }
-
-    function clearGallery() {
-      const imageGrid = document.getElementById('image-grid');
-      imageGrid.innerHTML = '';
-      imageCache = [];
-      saveToLocalStorage();
-    }
-
-    function calculateAspectRatio(aspectRatio, width, height) {
-      const [ratioWidth, ratioHeight] = aspectRatio.split(':').map(Number);
-      let newWidth = width;
-      let newHeight = height;
-      
-      if (ratioWidth > ratioHeight) {
-        newHeight = Math.round((width / ratioWidth) * ratioHeight);
-      } else if (ratioHeight > ratioWidth) {
-        newWidth = Math.round((height / ratioHeight) * ratioWidth);
-      }
-      
-      if (aspectRatio === '1:1') {
-        newWidth = Math.min(width, height);
-        newHeight = newWidth;
-      }
-      
-      return [newWidth, newHeight];
-    }
-
-    document.getElementById('aspect-ratio').addEventListener('change', function() {
-      const aspectRatio = this.value;
-      const widthInput = document.getElementById('custom-width');
-      const heightInput = document.getElementById('custom-height');
-      let width = parseInt(widthInput.value);
-      let height = parseInt(heightInput.value);
-
-      [width, height] = calculateAspectRatio(aspectRatio, width, height);
-
-      widthInput.value = width;
-      heightInput.value = height;
-    });
-
-    function updateResolutionBasedOnAspectRatio() {
-      const aspectRatio = document.getElementById('aspect-ratio').value;
-      const widthInput = document.getElementById('custom-width');
-      const heightInput = document.getElementById('custom-height');
-      let width = parseInt(widthInput.value);
-      let height = parseInt(heightInput.value);
-
-      [width, height] = calculateAspectRatio(aspectRatio, width, height);
-
-      widthInput.value = width;
-      heightInput.value = height;
-    }
-
-    document.getElementById('custom-width').addEventListener('change', updateResolutionBasedOnAspectRatio)
-    document.getElementById('custom-height').addEventListener('change', updateResolutionBasedOnAspectRatio)
-
-    document.getElementById('useAiPrompt').addEventListener('change', function() {
-      usingAiPrompt = this.checked;
-      const promptInput = document.getElementById('prompt');
-      const aiPromptInputGroup = document.querySelector('.ai-prompt-input-group');
-        
-      if (usingAiPrompt) {
-        promptInput.style.display = 'none';
-        aiPromptInputGroup.classList.add('active');
-            
-      } else {
-        promptInput.style.display = 'block';
-        aiPromptInputGroup.classList.remove('active');
-      }
-    });
-
-    document.getElementById('enhanceQuality').addEventListener('change', function() {
-      enhanceQuality = this.checked;
-    });
-
-    async function generateImages() {
-      if (isGenerating) return;
-      isGenerating = true;
-      document.getElementById('generatingMessage').style.display = 'block';
-      
-      let prompt = document.getElementById('prompt').value;
-      if(usingAiPrompt) {
-        const aiPromptInput = document.getElementById('aiPrompt').value;
-        const tone = document.getElementById('tone').value;
-        prompt = await generateAiPrompt(aiPromptInput, tone)
-      }
-
-      const style = document.getElementById('style').value;
-
-      if(style !== "None") {
-        prompt = style + ", " + prompt;
-      }
-      const aspectRatio = document.getElementById('aspect-ratio').value;
-      const width = document.getElementById('custom-width').value;
-      const height = document.getElementById('custom-height').value;
-      const numImages = document.getElementById('num-images').value;
-      const seedInput = document.getElementById('seed').value;
-      const model = document.getElementById('model').value;
-
-
-      if (prompt && !promptHistory.includes(prompt)) {
-        promptHistory.push(prompt);
-        if (promptHistory.length > 10) {
-          promptHistory.shift();
-        }
-        savePromptHistory();
-      }
-
-      if (usingAiPrompt && document.getElementById('aiPrompt').value && !aiPromptHistory.includes(document.getElementById('aiPrompt').value)) {
-        aiPromptHistory.push(document.getElementById('aiPrompt').value);
-        if (aiPromptHistory.length > 1) {
-          aiPromptHistory.shift();
-        }
-        saveAiPromptHistory();
-      }
-
-      const imageGrid = document.getElementById('image-grid');
-
-      for (let i = 0; i < numImages; i++) {
-        const seed = seedInput === '0' ? Math.floor(Math.random() * 1000000) : parseInt(seedInput) + i;
-          let imageUrl = await attemptGenerateImage(prompt, width, height, seed, model, enhanceQuality)
-        const imageItem = createImageItem(imageUrl, seed, prompt);
-        imageGrid.insertBefore(imageItem, imageGrid.firstChild);
-        imageCache.unshift({ src: imageUrl, seed: seed, prompt: prompt });
-      }
-        
-      isGenerating = false;
-      document.getElementById('generatingMessage').style.display = 'none';
-      saveToLocalStorage();
-    }
-
-    async function attemptGenerateImage(prompt, width, height, seed, model, enhanceQuality, attempts = 0) {
-      let imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=${model}`;
-       if (enhanceQuality) {
-          imageUrl += '&enhance=true';
-        }
-        
-        try {
-            const response = await fetch(imageUrl, {method: 'HEAD'});
-          if(response.ok) {
-              return imageUrl;
-          } else if (attempts < 5) {
-            const newSeed =  Math.floor(Math.random() * 1000000);
-            return await attemptGenerateImage(prompt, width, height, newSeed, model, enhanceQuality, attempts + 1);
-          } else {
-             return '/a/f8ce268b-ae1d-478e-8aff-ed84df627665';
-          }
-      } catch (error) {
-           if (attempts < 5) {
-            const newSeed =  Math.floor(Math.random() * 1000000);
-            return await attemptGenerateImage(prompt, width, height, newSeed, model, enhanceQuality, attempts + 1);
-           } else {
-             return '/a/f8ce268b-ae1d-478e-8aff-ed84df627665';
-          }
-      }
-    }
-
-    async function generateAiPrompt(aiPromptInput, tone) {
-      try {
-        const response = await fetch('/api/ai_completion', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({ 
-            prompt: `Please generate 3 ChatGPT prompt versions based on the following keywords/description: ${aiPromptInput}, Tone: ${tone}
-            <typescript-interface>
-            interface Response {
-                success: boolean;
-                data: {
-                  data: {
-                    choices: Array<{
-                        message: {
-                          content: string;
-                        }
-                     }>
-                  }
-                }
-            }
-          </typescript-interface>
-          <example>
-          {
-              "success": true,
-              "data": {
-                  "data": {
-                      "choices": [
-                        {
-                          "message": {
-                            "content": "1. **Imaginative Scene**: Picture a cozy living room where Scooby-Doo, the lovable Great Dane, is sprawled out on a plush couch. The flickering light from the television casts playful shadows across the room as Scooby, with his big, soulful eyes, watches intently. A bowl of Scooby Snacks lies nearby,
-</example>
-            `,
-            data: aiPromptInput
-          }),
-        });
-        const responseData = await response.json();
-        
-        if(responseData.success && responseData.data.data.choices && responseData.data.data.choices[0] && responseData.data.data.choices[0].message.content) {
-          let aiPrompt = responseData.data.data.choices[0].message.content;
-          aiPrompt = aiPrompt.replace(/^[0-9]+\.\s*/gm, '');
-          return aiPrompt;
-        } else {
-          console.error("Error generating prompt", responseData)
-          return aiPromptInput
-        }
-
-      } catch (error) {
-        console.error('Error fetching AI response:', error);
-        return aiPromptInput;
-      }
-    }
-
-    function createImageItem(src, seed, prompt) {
-      const imageItem = document.createElement('div');
-      imageItem.className = 'image-item';
-
-      const imgElement = document.createElement('img');
-      imgElement.src = src;
-      imgElement.alt = `Generated image with seed ${seed}`;
-
-      const downloadBtn = document.createElement('button');
-      downloadBtn.className = 'download-btn';
-      downloadBtn.innerHTML = '↓';
-      downloadBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const filename = `image_seed_${seed}.png`;
-        downloadImage(src, filename);
-      });
-
-      const removeBtn = document.createElement('button');
-      removeBtn.className = 'remove-btn';
-      removeBtn.innerHTML = '×';
-      removeBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        imageItem.remove();
-        const index = imageCache.findIndex(img => img.src === src);
-        if (index > -1) {
-          imageCache.splice(index, 1);
-          saveToLocalStorage();
-        }
-      });
-
-      const regenerateBtn = document.createElement('button');
-      regenerateBtn.className = 'regenerate-btn';
-      regenerateBtn.innerHTML = '↻';
-      regenerateBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const newSeed = Math.floor(Math.random() * 1000000);
-        updateImageWithNewSeed(newSeed, src);
-      });
-
-      const imageInfo = document.createElement('div');
-      imageInfo.className = 'image-info';
-      imageInfo.textContent = `Seed: ${seed}`;
-
-      imageItem.appendChild(downloadBtn);
-      imageItem.appendChild(imgElement);
-      imageItem.appendChild(removeBtn);
-      imageItem.appendChild(regenerateBtn);
-      imageItem.appendChild(imageInfo);
-      imageItem.addEventListener('click', () => openModal(src, prompt, seed));
-
-      return imageItem;
-    }
-
-    function openModal(imageUrl, prompt, seed) {
-      const modal = document.getElementById('imageModal');
-      const modalImg = document.getElementById('modalImage');
-      const promptDisplay = document.getElementById('promptDisplay');
-      const seedInput = document.getElementById('modalSeed');
-      modal.style.display = "block";
-      modalImg.src = imageUrl;
-
-      const extractedPrompt = decodeURIComponent(imageUrl.split('?')[0].split('/prompt/')[1]);
-      promptDisplay.textContent = extractedPrompt || prompt || "Prompt not available";
-      promptDisplay.style.display = "block";
-
-      seedInput.value = seed;
-      currentImageIndex = imageCache.findIndex(img => img.src === imageUrl);
-        
-      document.addEventListener('keydown', handleModalKeydown);
-      seedInput.addEventListener('focus', function() {
-        document.removeEventListener('keydown', handleModalKeydown);
-      });
-      seedInput.addEventListener('blur', function() {
-        document.addEventListener('keydown', handleModalKeydown);
-      });
-    }
-
-    function handleModalKeydown(e) {
-      if (e.key === 'ArrowLeft') {
-        navigateImage(-1);
-      } else if (e.key === 'ArrowRight') {
-        navigateImage(1);
-      } else if (e.key === 'Escape') {
-        closeModal();
-      } else if (e.key === 'r' || e.key === 'R') {
-        regenerateImage();
-      }
-    }
-
-    function closeModal() {
-      document.getElementById('imageModal').style.display = "none";
-      document.removeEventListener('keydown', handleModalKeydown);
-    }
-
-    document.querySelector('.close').onclick = closeModal
-
-    document.getElementById('prevImage').onclick = function() {
-      navigateImage(-1);
-    }
-
-    document.getElementById('nextImage').onclick = function() {
-      navigateImage(1);
-    }
-
-    document.getElementById('openInNewWindow').onclick = function() {
-      const modalImg = document.getElementById('modalImage');
-      window.open(modalImg.src, '_blank');
-    }
-
-    function navigateImage(direction) {
-      currentImageIndex += direction;
-      if (currentImageIndex < 0) currentImageIndex = imageCache.length - 1;
-      if (currentImageIndex >= imageCache.length) currentImageIndex = 0;
-
-      const modalImg = document.getElementById('modalImage');
-      const promptDisplay = document.getElementById('promptDisplay');
-      const seedInput = document.getElementById('modalSeed');
-      modalImg.src = imageCache[currentImageIndex].src;
-
-      const extractedPrompt = decodeURIComponent(imageCache[currentImageIndex].src.split('?')[0].split('/prompt/')[1]);
-      promptDisplay.textContent = extractedPrompt || imageCache[currentImageIndex].prompt || "Prompt not available";
-      promptDisplay.style.display = "block";
-      seedInput.value = imageCache[currentImageIndex].seed;
-    }
-
-    function regenerateImage() {
-      const modalSeed = document.getElementById('modalSeed');
-      const newSeed = Math.floor(Math.random() * 1000000);
-      modalSeed.value = newSeed;
-      updateImageWithNewSeed(newSeed, imageCache[currentImageIndex].src);
-    }
-
-    function updateImageWithNewSeed(newSeed, imageUrl) {
-      const currentImage = imageCache[currentImageIndex];
-      const [width, height] = [document.getElementById('custom-width').value, document.getElementById('custom-height').value];
-      const model = document.getElementById('model').value;
-      const newSrc = `https://image.pollinations.ai/prompt/${encodeURIComponent(currentImage.prompt)}?width=${width}&height=${height}&seed=${newSeed}&nologo=true&enhance=true&model=${model}`;
-
-      const modalImg = document.getElementById('modalImage');
-      modalImg.src = newSrc;
-
-      currentImage.src = newSrc;
-      currentImage.seed = newSeed;
-
-      const imageGrid = document.getElementById('image-grid');
-      const imageItem = createImageItem(newSrc, newSeed, currentImage.prompt);
-      imageGrid.insertBefore(imageItem, imageGrid.firstChild);
-      imageCache.unshift({ src: newSrc, seed: newSeed, prompt: currentImage.prompt });
-      saveToLocalStorage();
-    }
-
-    function saveToLocalStorage() {
-      localStorage.setItem('imageCache', JSON.stringify(imageCache));
-    }
-
-    function loadFromLocalStorage() {
-      const storedCache = localStorage.getItem('imageCache');
-      if (storedCache) {
-        imageCache = JSON.parse(storedCache);
-        renderStoredImages();
-      }
-    }
-
-    function renderStoredImages() {
-      const imageGrid = document.getElementById('image-grid');
-      imageGrid.innerHTML = '';
-      imageCache.forEach(img => {
-        const imageItem = createImageItem(img.src, img.seed, img.prompt);
-        imageGrid.appendChild(imageItem);
-      });
-    }
-
-    window.addEventListener('load', function() {
-      loadFromLocalStorage();
-    });
-
-    document.getElementById('imageModal').addEventListener('click', function(e) {
-      if (e.target === this) {
-        this.style.display = "none";
-      }
-    });
-
-    function savePromptHistory() {
-      localStorage.setItem('promptHistory', JSON.stringify(promptHistory));
-    }
-
-    function loadPromptHistory() {
-      const storedHistory = localStorage.getItem('promptHistory');
-      if (storedHistory) {
-        promptHistory = JSON.parse(storedHistory);
-      }
-    }
-
-    document.getElementById('useAiPrompt').addEventListener('change', function() {
-      usingAiPrompt = this.checked;
-      const promptInput = document.getElementById('prompt');
-      const aiPromptInputGroup = document.querySelector('.ai-prompt-input-group');
-        
-      if (usingAiPrompt) {
-        promptInput.style.display = 'none';
-        aiPromptInputGroup.classList.add('active');
-            
-      } else {
-        promptInput.style.display = 'block';
-        aiPromptInputGroup.classList.remove('active');
-      }
-    });
-
-    document.getElementById('modalSeed').addEventListener('change', function() {
-      const newSeed = this.value;
-      updateImageWithNewSeed(newSeed, imageCache[currentImageIndex].src);
-    });
-
-    function exitFullscreen() {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      }
-    }
-
-    function downloadImage(url, filename) {
-      fetch(url, {
-        method: 'GET',
-        mode: 'cors', 
-        cache: 'no-cache', 
-      })
-      .then(response => response.blob())
-      .then(blob => {
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-      })
-      .catch(error => console.error('Error downloading image:', error));
-    }
-
-    function saveSettingsToLocalStorage() {
-      const settings = {
-        useAiPrompt: usingAiPrompt,
-        enhanceQuality: enhanceQuality,
-      };
-      localStorage.setItem('settings', JSON.stringify(settings));
-    }
-
-    function saveAiPromptHistory() {
-      localStorage.setItem('aiPromptHistory', JSON.stringify(aiPromptHistory));
-    }
-
-    function loadAiPromptHistory() {
-      const storedHistory = localStorage.getItem('aiPromptHistory');
-      if (storedHistory) {
-        aiPromptHistory = JSON.parse(storedHistory);
-      }
-    }
-  </script>
-</body>
+    <div id="warningModal" class="warning-modal">
+      <div class="warning-content">
+        <h2>Warning</h2>
+        <p>Are you sure you want to clear the gallery? This action cannot be undone.</p>
+        <div class="warning-buttons">
+          <button id="confirmClear">Yes, Clear</button>
+          <button id="cancelClear">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <div class="theme-toggle" id="themeToggle">
+      <span class="sun"><i class="fas fa-sun"></i></span>
+      <span class="moon"><i class="fas fa-moon"></i></span>
+    </div>
+    <script src="js/main.js"></script>
+  </body>
 </html>
