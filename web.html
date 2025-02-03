@@ -4,13 +4,509 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Free Image Generator</title>
     <link rel="icon" type="image/png" href="https://i.imgur.com/JP4qYpv.png" />
-    <link rel="stylesheet" href="css/styles.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <style>
+      /* Variables for colors and sizing */
+      :root {
+        --bg-dark: #181818;
+        --bg-light: #f9f9f9;
+        --text-dark: #e0e0e0;
+        --text-light: #333;
+        --accent-green: #4caf50;
+        --accent-blue: #007bff;
+        --accent-red: #dc3545;
+        --border-color-dark: #555;
+        --border-color-light: #ddd;
+        --transition-speed: 0.3s;
+      }
+      
+      /* Reset and Base Styling */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-dark);
+        transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        overflow-x: hidden;
+      }
+      
+      body.light-mode {
+        background-color: var(--bg-light);
+        color: var(--text-light);
+      }
+      
+      /* Container */
+      .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+      }
+      
+      /* Header */
+      .header {
+        display: flex;
+        flex-direction: column;
+        background-color: #242424;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        align-items: center;
+      }
+      
+      .header-container {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        width: 100%;
+      }
+      
+      /* Adjusted logo styling: enlarged and maintaining square ratio without stretching */
+      .logo {
+        flex-shrink: 0;
+        width: 200px;
+        height: 200px;
+        overflow: hidden;
+      }
+      
+      .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform var(--transition-speed) ease;
+      }
+      
+      .logo img:hover {
+        transform: scale(1.05);
+      }
+      
+      /* Prompt container and input (only one prompt input now; AI prompt is handled in the sidebar) */
+      .prompt-container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .prompt-container input[type='text'] {
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color-dark);
+        background-color: #2a2a2a;
+        color: inherit;
+        font-size: 1rem;
+        transition: border-color var(--transition-speed) ease;
+      }
+      
+      .prompt-container input[type='text']:focus {
+        border-color: var(--accent-blue);
+        outline: none;
+      }
+      
+      /* Hide AI prompt input group by default */
+      .ai-prompt-input-group {
+        display: none;
+      }
+      
+      .ai-prompt-input-group.active {
+        display: block;
+      }
+      
+      /* Generating Message */
+      .generating-message {
+        background-color: var(--accent-green);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 6px;
+        font-weight: bold;
+        display: none;
+        align-self: flex-end;
+        animation: flashing 1s linear infinite;
+        font-size: 0.95rem;
+      }
+      
+      @keyframes flashing {
+        0% { opacity: 1; }
+        50% { opacity: 0.4; }
+        100% { opacity: 1; }
+      }
+      
+      /* Main Layout */
+      .main {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+      }
+      
+      /* Sidebar */
+      .sidebar {
+        width: 320px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        background-color: #2a2a2a;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+      }
+      
+      body.light-mode .sidebar {
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      
+      /* Content */
+      .content {
+        flex-grow: 1;
+        padding: 20px;
+      }
+      
+      /* Form Groups */
+      .input-group {
+        margin-bottom: 12px;
+      }
+      
+      .input-group label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #ccc;
+      }
+      
+      body.light-mode .input-group label {
+        color: #555;
+      }
+      
+      input[type='text'],
+      select,
+      input[type='number'] {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color-dark);
+        background-color: #2a2a2a;
+        color: inherit;
+        font-size: 0.95rem;
+        transition: border-color var(--transition-speed) ease;
+      }
+      
+      body.light-mode input[type='text'],
+      body.light-mode select,
+      body.light-mode input[type='number'] {
+        background-color: #fff;
+        color: #333;
+        border-color: var(--border-color-light);
+      }
+      
+      input[type='text']:focus,
+      select:focus,
+      input[type='number']:focus {
+        border-color: var(--accent-blue);
+        outline: none;
+      }
+      
+      /* Buttons */
+      button {
+        background-color: var(--accent-green);
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color var(--transition-speed) ease;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      
+      button:hover {
+        background-color: #45a049;
+      }
+      
+      #clearGalleryButton {
+        background-color: var(--accent-red);
+      }
+      
+      #clearGalleryButton:hover {
+        background-color: #c82333;
+      }
+      
+      /* Custom Resolution */
+      .custom-resolution {
+        display: flex;
+        gap: 10px;
+      }
+      
+      .custom-resolution .input-group {
+        flex: 1;
+      }
+      
+      /* Image Grid */
+      .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+      }
+      
+      .image-item {
+        position: relative;
+        background-color: #242424;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.2s ease, background-color 0.3s ease;
+      }
+      
+      .image-item:hover {
+        transform: scale(1.02);
+      }
+      
+      body.light-mode .image-item {
+        background-color: #e0e0e0;
+      }
+      
+      .image-item img {
+        width: 100%;
+        display: block;
+      }
+      
+      /* Overlay Buttons on Image Item */
+      .image-item button.remove-btn,
+      .image-item button.regenerate-btn,
+      .image-item button.download-btn {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.85;
+        transition: opacity 0.3s ease;
+      }
+      
+      .image-item button.remove-btn:hover,
+      .image-item button.regenerate-btn:hover,
+      .image-item button.download-btn:hover {
+        opacity: 1;
+      }
+      
+      .image-item button.remove-btn {
+        top: 8px;
+        right: 8px;
+      }
+      
+      .image-item button.regenerate-btn {
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      
+      .image-item button.download-btn {
+        top: 8px;
+        left: 8px;
+      }
+      
+      /* Image Information */
+      .image-info {
+        padding: 8px;
+        font-size: 0.8rem;
+        text-align: center;
+      }
+      
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+      }
+      
+      .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+        max-height: 80%;
+        object-fit: contain;
+      }
+      
+      .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      
+      /* Modal Navigation Buttons */
+      .nav-buttons {
+        position: absolute;
+        bottom: 70px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 35px;
+      }
+      
+      .nav-buttons button {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      
+      /* Modal Prompt Display */
+      .prompt-display {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        max-width: 80%;
+        max-height: 60px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+      
+      /* Seed Input in Modal */
+      .seed-input {
+        position: absolute;
+        top: 60px;
+        left: 10px;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 5px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      
+      .seed-input input {
+        width: 100px;
+      }
+      
+      /* Theme Toggle */
+      .theme-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        color: #555;
+        transition: color var(--transition-speed) ease, background-color var(--transition-speed) ease;
+      }
+      
+      .theme-toggle:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+        color: #333;
+      }
+      
+      body.light-mode .theme-toggle {
+        background-color: rgba(0, 0, 0, 0.05);
+        color: #ccc;
+      }
+      
+      body.light-mode .theme-toggle:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+        color: #eee;
+      }
+      
+      .theme-toggle .sun,
+      .theme-toggle .moon {
+        font-size: 1.2rem;
+      }
+      
+      .theme-toggle .sun {
+        display: none;
+      }
+      
+      body.light-mode .theme-toggle .sun {
+        display: block;
+      }
+      
+      body.light-mode .theme-toggle .moon {
+        display: none;
+      }
+      
+      /* Warning Modal */
+      .warning-modal {
+        display: none; 
+        position: fixed;
+        z-index: 1001;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .warning-content {
+        background-color: #242424;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 300px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      
+      body.light-mode .warning-content {
+        background-color: #e0e0e0;
+        color: #333;
+      }
+      
+      .warning-buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+      
+      .warning-buttons button {
+        padding: 5px 15px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
@@ -20,15 +516,8 @@
             <img src="https://i.imgur.com/JP4qYpv.png" alt="Image Generator Logo" />
           </div>
           <div class="prompt-container">
+            <!-- Only one prompt input is shown in the header -->
             <input type="text" id="prompt" placeholder="Enter your prompt here" autocomplete="off" />
-            <div class="ai-prompt-input-group">
-              <input
-                type="text"
-                id="aiPrompt"
-                placeholder="Enter your prompt for AI enhancement here"
-                autocomplete="off"
-              />
-            </div>
           </div>
         </div>
         <div class="generating-message" id="generatingMessage">Generating...</div>
@@ -36,11 +525,12 @@
       <main class="main">
         <aside class="sidebar">
           <form id="generate-form">
-            <div class="ai-prompt-container">
+            <div class="input-group">
               <input type="checkbox" id="useAiPrompt" />
               <label for="useAiPrompt">Enhance prompt with AI</label>
             </div>
-            <div class="input-group ai-prompt-input-group">
+            <!-- AI Tone selector appears only when checkbox is active -->
+            <div class="input-group ai-prompt-input-group" id="aiToneGroup">
               <label for="tone">AI Tone:</label>
               <select id="tone">
                 <option value="Narrative">Narrative</option>
@@ -127,7 +617,7 @@
                 <option value="turbo">Turbo</option>
               </select>
             </div>
-            <div class="enhance-quality-container">
+            <div class="input-group">
               <input type="checkbox" id="enhanceQuality" />
               <label for="enhanceQuality">Enhance Quality</label>
             </div>
@@ -167,6 +657,7 @@
         </section>
       </main>
     </div>
+    <!-- Modal for images -->
     <div id="imageModal" class="modal">
       <span class="close">×</span>
       <img class="modal-content" id="modalImage" />
@@ -174,8 +665,7 @@
         <button id="prevImage"><i class="fas fa-arrow-left"></i> Previous</button>
         <button id="nextImage">Next <i class="fas fa-arrow-right"></i></button>
       </div>
-      <button id="openInNewWindow"><i class="fas fa-external-link-alt"></i>
-        Open in New Window</button>
+      <button id="openInNewWindow"><i class="fas fa-external-link-alt"></i> Open in New Window</button>
       <div class="prompt-display" id="promptDisplay"></div>
       <div class="seed-input">
         <label for="modalSeed">Seed:</label>
@@ -183,6 +673,7 @@
         <button id="regenerateSeed"><i class="fas fa-sync-alt"></i> Regenerate</button>
       </div>
     </div>
+    <!-- Warning Modal -->
     <div id="warningModal" class="warning-modal">
       <div class="warning-content">
         <h2>Warning</h2>
@@ -193,10 +684,433 @@
         </div>
       </div>
     </div>
+    <!-- Theme Toggle -->
     <div class="theme-toggle" id="themeToggle">
       <span class="sun"><i class="fas fa-sun"></i></span>
       <span class="moon"><i class="fas fa-moon"></i></span>
     </div>
-    <script src="js/main.js"></script>
+    <script>
+      let imageCache = [];
+      let currentImageIndex = 0;
+      let isGenerating = false;
+      let promptHistory = [];
+      let aiPromptHistory = [];
+      let isDarkMode = true;
+      let usingAiPrompt = false;
+      let enhanceQuality = false;
+      
+      // Theme functions
+      document.getElementById("themeToggle").addEventListener("click", toggleTheme);
+      
+      function toggleTheme() {
+        isDarkMode = !isDarkMode;
+        document.body.classList.toggle("light-mode", !isDarkMode);
+        localStorage.setItem("darkMode", isDarkMode);
+        updateThemeIcon();
+      }
+      
+      function applyTheme() {
+        const storedMode = localStorage.getItem("darkMode");
+        if (storedMode) {
+          isDarkMode = storedMode === "true";
+          document.body.classList.toggle("light-mode", !isDarkMode);
+        }
+        updateThemeIcon();
+      }
+      
+      function updateThemeIcon() {
+        const themeToggle = document.getElementById("themeToggle");
+        themeToggle.querySelector(".sun").style.display = isDarkMode ? "none" : "block";
+        themeToggle.querySelector(".moon").style.display = isDarkMode ? "block" : "none";
+      }
+      
+      document.addEventListener("DOMContentLoaded", () => {
+        applyTheme();
+        // Ensure warning modal is hidden on load (fix potential bug)
+        document.getElementById("warningModal").style.display = "none";
+      });
+      
+      // Form submission
+      document.getElementById("generate-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        generateImages();
+      });
+      
+      // Allow Enter key to trigger generation on prompt field
+      document.getElementById("prompt").addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          generateImages();
+        }
+      });
+      
+      // Toggle AI tone input group when checkbox changes
+      document.getElementById("useAiPrompt").addEventListener("change", function () {
+        usingAiPrompt = this.checked;
+        const aiToneGroup = document.getElementById("aiToneGroup");
+        if (usingAiPrompt) {
+          aiToneGroup.classList.add("active");
+        } else {
+          aiToneGroup.classList.remove("active");
+        }
+      });
+      
+      document.getElementById("enhanceQuality").addEventListener("change", function () {
+        enhanceQuality = this.checked;
+      });
+      
+      // Adjust resolution based on aspect ratio
+      document.getElementById("aspect-ratio").addEventListener("change", function () {
+        const aspectRatio = this.value;
+        updateResolution(aspectRatio);
+      });
+      
+      document.getElementById("custom-width").addEventListener("change", updateResolutionBasedOnInput);
+      document.getElementById("custom-height").addEventListener("change", updateResolutionBasedOnInput);
+      
+      function calculateAspectRatio(aspectRatio, width, height) {
+        const [ratioWidth, ratioHeight] = aspectRatio.split(":").map(Number);
+        let newWidth = width;
+        let newHeight = height;
+        if (ratioWidth > ratioHeight) {
+          newHeight = Math.round((width / ratioWidth) * ratioHeight);
+        } else if (ratioHeight > ratioWidth) {
+          newWidth = Math.round((height / ratioHeight) * ratioWidth);
+        }
+        if (aspectRatio === "1:1") {
+          newWidth = Math.min(width, height);
+          newHeight = newWidth;
+        }
+        return [newWidth, newHeight];
+      }
+      
+      function updateResolution(aspectRatio) {
+        const widthInput = document.getElementById("custom-width");
+        const heightInput = document.getElementById("custom-height");
+        let width = parseInt(widthInput.value);
+        let height = parseInt(heightInput.value);
+        [width, height] = calculateAspectRatio(aspectRatio, width, height);
+        widthInput.value = width;
+        heightInput.value = height;
+      }
+      
+      function updateResolutionBasedOnInput() {
+        const aspectRatio = document.getElementById("aspect-ratio").value;
+        updateResolution(aspectRatio);
+      }
+      
+      async function generateImages() {
+        if (isGenerating) return;
+        isGenerating = true;
+        document.getElementById("generatingMessage").style.display = "block";
+        let prompt = document.getElementById("prompt").value;
+        if (usingAiPrompt) {
+          // If AI prompt enhancement is enabled, generate enhanced prompt using tone
+          const tone = document.getElementById("tone").value;
+          prompt = await generateAiPrompt(prompt, tone);
+        }
+        const style = document.getElementById("style").value;
+        if (style !== "None") {
+          prompt = style + ", " + prompt;
+        }
+        const aspectRatio = document.getElementById("aspect-ratio").value;
+        const width = document.getElementById("custom-width").value;
+        const height = document.getElementById("custom-height").value;
+        const numImages = document.getElementById("num-images").value;
+        const seedInput = document.getElementById("seed").value;
+        if (prompt && !promptHistory.includes(prompt)) {
+          promptHistory.push(prompt);
+          if (promptHistory.length > 10) {
+            promptHistory.shift();
+          }
+          localStorage.setItem("promptHistory", JSON.stringify(promptHistory));
+        }
+        if (usingAiPrompt && prompt && !aiPromptHistory.includes(prompt)) {
+          aiPromptHistory.push(prompt);
+          if (aiPromptHistory.length > 1) {
+            aiPromptHistory.shift();
+          }
+          localStorage.setItem("aiPromptHistory", JSON.stringify(aiPromptHistory));
+        }
+        const imageGrid = document.getElementById("image-grid");
+        for (let i = 0; i < numImages; i++) {
+          const seed = seedInput === "0" ? Math.floor(Math.random() * 1000000) : parseInt(seedInput) + i;
+          let imageUrl = await attemptGenerateImage(prompt, width, height, seed, document.getElementById("model").value, enhanceQuality);
+          const imageItem = createImageItem(imageUrl, seed, prompt);
+          imageGrid.insertBefore(imageItem, imageGrid.firstChild);
+          imageCache.unshift({ src: imageUrl, seed: seed, prompt: prompt });
+        }
+        isGenerating = false;
+        document.getElementById("generatingMessage").style.display = "none";
+        saveToLocalStorage();
+      }
+      
+      async function attemptGenerateImage(prompt, width, height, seed, model, enhanceQuality, attempts = 0) {
+        let imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=${model}`;
+        if (enhanceQuality) {
+          imageUrl += "&enhance=true";
+        }
+        try {
+          const response = await fetch(imageUrl, { method: "HEAD" });
+          if (response.ok) {
+            return imageUrl;
+          } else if (attempts < 5) {
+            const newSeed = Math.floor(Math.random() * 1000000);
+            return await attemptGenerateImage(prompt, width, height, newSeed, model, enhanceQuality, attempts + 1);
+          } else {
+            return imageUrl;
+          }
+        } catch (error) {
+          if (attempts < 5) {
+            const newSeed = Math.floor(Math.random() * 1000000);
+            return await attemptGenerateImage(prompt, width, height, newSeed, model, enhanceQuality, attempts + 1);
+          } else {
+            return imageUrl;
+          }
+        }
+      }
+      
+      async function generateAiPrompt(aiPromptInput, tone) {
+        try {
+          const response = await fetch("/api/ai_completion", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              prompt: `Please generate 3 ChatGPT prompt versions based on the following keywords/description: ${aiPromptInput}, Tone: ${tone}`,
+              data: aiPromptInput,
+            }),
+          });
+          const responseData = await response.json();
+          if (
+            responseData.success &&
+            responseData.data &&
+            responseData.data.data &&
+            responseData.data.data.choices &&
+            responseData.data.data.choices[0] &&
+            responseData.data.data.choices[0].message.content
+          ) {
+            let aiPrompt = responseData.data.data.choices[0].message.content;
+            aiPrompt = aiPrompt.replace(/^[0-9]+\.\s*/gm, "");
+            return aiPrompt;
+          } else {
+            console.error("Error generating prompt", responseData);
+            return aiPromptInput;
+          }
+        } catch (error) {
+          console.error("Error fetching AI response:", error);
+          return aiPromptInput;
+        }
+      }
+      
+      function createImageItem(src, seed, prompt) {
+        const imageItem = document.createElement("div");
+        imageItem.className = "image-item";
+        
+        const imgElement = document.createElement("img");
+        imgElement.src = src;
+        imgElement.alt = `Generated image with seed ${seed}`;
+        
+        const downloadBtn = document.createElement("button");
+        downloadBtn.className = "download-btn";
+        downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+        downloadBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          downloadImage(src, `image_seed_${seed}.png`);
+        });
+        
+        const removeBtn = document.createElement("button");
+        removeBtn.className = "remove-btn";
+        removeBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        removeBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          imageItem.remove();
+          const index = imageCache.findIndex(img => img.src === src);
+          if (index > -1) {
+            imageCache.splice(index, 1);
+            saveToLocalStorage();
+          }
+        });
+        
+        const regenerateBtn = document.createElement("button");
+        regenerateBtn.className = "regenerate-btn";
+        regenerateBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+        regenerateBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          const newSeed = Math.floor(Math.random() * 1000000);
+          updateImageWithNewSeed(newSeed, src);
+        });
+        
+        const imageInfo = document.createElement("div");
+        imageInfo.className = "image-info";
+        imageInfo.textContent = `Seed: ${seed}`;
+        
+        imageItem.appendChild(downloadBtn);
+        imageItem.appendChild(imgElement);
+        imageItem.appendChild(removeBtn);
+        imageItem.appendChild(regenerateBtn);
+        imageItem.appendChild(imageInfo);
+        imageItem.addEventListener("click", () => openModal(src, prompt, seed));
+        return imageItem;
+      }
+      
+      function openModal(imageUrl, prompt, seed) {
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("modalImage");
+        const promptDisplay = document.getElementById("promptDisplay");
+        const seedInput = document.getElementById("modalSeed");
+        modal.style.display = "block";
+        modalImg.src = imageUrl;
+        const extractedPrompt = decodeURIComponent(imageUrl.split("?")[0].split("/prompt/")[1]);
+        promptDisplay.textContent = extractedPrompt || prompt || "Prompt not available";
+        promptDisplay.style.display = "block";
+        seedInput.value = seed;
+        currentImageIndex = imageCache.findIndex(img => img.src === imageUrl);
+        document.addEventListener("keydown", handleModalKeydown);
+        seedInput.addEventListener("focus", () => {
+          document.removeEventListener("keydown", handleModalKeydown);
+        });
+        seedInput.addEventListener("blur", () => {
+          document.addEventListener("keydown", handleModalKeydown);
+        });
+      }
+      
+      function handleModalKeydown(e) {
+        if (e.key === "ArrowLeft") {
+          navigateImage(-1);
+        } else if (e.key === "ArrowRight") {
+          navigateImage(1);
+        } else if (e.key === "Escape") {
+          closeModal();
+        } else if (e.key.toLowerCase() === "r") {
+          regenerateImage();
+        }
+      }
+      
+      function closeModal() {
+        document.getElementById("imageModal").style.display = "none";
+        document.removeEventListener("keydown", handleModalKeydown);
+      }
+      
+      document.querySelector(".close").onclick = closeModal;
+      
+      document.getElementById("prevImage").onclick = () => navigateImage(-1);
+      document.getElementById("nextImage").onclick = () => navigateImage(1);
+      document.getElementById("openInNewWindow").onclick = function () {
+        const modalImg = document.getElementById("modalImage");
+        window.open(modalImg.src, "_blank");
+      };
+      
+      function navigateImage(direction) {
+        currentImageIndex += direction;
+        if (currentImageIndex < 0) currentImageIndex = imageCache.length - 1;
+        if (currentImageIndex >= imageCache.length) currentImageIndex = 0;
+        const modalImg = document.getElementById("modalImage");
+        const promptDisplay = document.getElementById("promptDisplay");
+        const seedInput = document.getElementById("modalSeed");
+        modalImg.src = imageCache[currentImageIndex].src;
+        const extractedPrompt = decodeURIComponent(
+          imageCache[currentImageIndex].src.split("?")[0].split("/prompt/")[1]
+        );
+        promptDisplay.textContent = extractedPrompt || imageCache[currentImageIndex].prompt || "Prompt not available";
+        promptDisplay.style.display = "block";
+        seedInput.value = imageCache[currentImageIndex].seed;
+      }
+      
+      function regenerateImage() {
+        const modalSeed = document.getElementById("modalSeed");
+        const newSeed = Math.floor(Math.random() * 1000000);
+        modalSeed.value = newSeed;
+        updateImageWithNewSeed(newSeed, imageCache[currentImageIndex].src);
+      }
+      
+      function updateImageWithNewSeed(newSeed, imageUrl) {
+        const currentImage = imageCache[currentImageIndex];
+        const width = document.getElementById("custom-width").value;
+        const height = document.getElementById("custom-height").value;
+        const model = document.getElementById("model").value;
+        const newSrc = `https://image.pollinations.ai/prompt/${encodeURIComponent(currentImage.prompt)}?width=${width}&height=${height}&seed=${newSeed}&nologo=true&enhance=${enhanceQuality ? "true" : "false"}&model=${model}`;
+        const modalImg = document.getElementById("modalImage");
+        modalImg.src = newSrc;
+        currentImage.src = newSrc;
+        currentImage.seed = newSeed;
+        const imageGrid = document.getElementById("image-grid");
+        const imageItem = createImageItem(newSrc, newSeed, currentImage.prompt);
+        imageGrid.insertBefore(imageItem, imageGrid.firstChild);
+        imageCache.unshift({ src: newSrc, seed: newSeed, prompt: currentImage.prompt });
+        saveToLocalStorage();
+      }
+      
+      function downloadImage(url, filename) {
+        fetch(url, {
+          method: "GET",
+          mode: "cors",
+          cache: "no-cache",
+        })
+          .then(response => response.blob())
+          .then(blob => {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+          })
+          .catch(error => console.error("Error downloading image:", error));
+      }
+      
+      function saveToLocalStorage() {
+        localStorage.setItem("imageCache", JSON.stringify(imageCache));
+      }
+      
+      function loadFromLocalStorage() {
+        const storedCache = localStorage.getItem("imageCache");
+        if (storedCache) {
+          imageCache = JSON.parse(storedCache);
+          renderStoredImages();
+        }
+      }
+      
+      function renderStoredImages() {
+        const imageGrid = document.getElementById("image-grid");
+        imageGrid.innerHTML = "";
+        imageCache.forEach(img => {
+          const imageItem = createImageItem(img.src, img.seed, img.prompt);
+          imageGrid.appendChild(imageItem);
+        });
+      }
+      
+      window.addEventListener("load", loadFromLocalStorage);
+      
+      document.getElementById("imageModal").addEventListener("click", function (e) {
+        if (e.target === this) {
+          this.style.display = "none";
+        }
+      });
+      
+      // Warning modal for clearing gallery
+      document.getElementById("clearGalleryButton").addEventListener("click", function () {
+        document.getElementById("warningModal").style.display = "flex";
+      });
+      
+      document.getElementById("confirmClear").addEventListener("click", function () {
+        clearGallery();
+        document.getElementById("warningModal").style.display = "none";
+      });
+      
+      document.getElementById("cancelClear").addEventListener("click", function () {
+        document.getElementById("warningModal").style.display = "none";
+      });
+      
+      function clearGallery() {
+        const imageGrid = document.getElementById("image-grid");
+        imageGrid.innerHTML = "";
+        imageCache = [];
+        saveToLocalStorage();
+      }
+    </script>
   </body>
 </html>
