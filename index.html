@@ -1,200 +1,24 @@
+<!DOCTYPE html>
 <html>
 <head>
-  <base href="www.skybrute.de">
-  <link rel="icon" href="https://i.imgur.com/JP4qYpv.png">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skybrute</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #333, #555);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-      color: #eee;
-    }
-
-    .container {
-      background-color: #222;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-      text-align: center;
-      animation: fadeIn 0.75s ease-out;
-      width: 80%;
-      max-width: 500px;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    h1 {
-      color: #fff;
-      margin-bottom: 30px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
-
-    p {
-      color: #ccc;
-      margin-bottom: 20px;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid #666;
-    }
-
-    input[type="password"] {
-      padding: 12px 15px;
-      border: none;
-      font-size: 16px;
-      background-color: #444;
-      color: #eee;
-      border-radius: 8px 8px 0 0;
-      outline: none;
-      transition: background-color 0.2s ease-in-out;
-    }
-
-    input[type="password"]:focus {
-      background-color: #555;
-      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.5);
-    }
-
-    .button-group {
-      display: flex;
-      gap: 5px;
-    }
-
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      flex: 1;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    /* Red button style for Imagegenerator */
-    .red-button {
-      background-color: #dc3545;
-    }
-    
-    .red-button:hover {
-      background-color: #a71d2a;
-    }
-  </style>
+    <title>Password Base</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* Verhindert Scrollbalken auf der Hauptseite */
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none; /* Entfernt den Rahmen um den iFrame */
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Passwortgeschützte Seite</h1>
-    <p>Gib das Passwort ein, um Zugriff zu erhalten:</p>
-    <div class="input-group">
-      <input type="password" id="password" placeholder="Passwort" onkeydown="handleEnterKey(event)">
-      <div class="button-group">
-        <button onclick="checkPassword()">Eingeben</button>
-        <button class="red-button" onclick="checkImageGen()">Zu Imagegenerator</button>
-      </div>
-    </div>
-  </div>
 
-  <script>
-    async function loadExternalContent(targetUrl) {
-      try {
-        const response = await fetch(targetUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const htmlText = await response.text();
-        document.documentElement.innerHTML = htmlText;
+    <iframe src="https://password-base.laveimma.workers.dev/"></iframe>
 
-        // Re-evaluate scripts in the loaded content.
-        const scripts = document.querySelectorAll('script');
-        scripts.forEach(script => {
-          const newScript = document.createElement('script');
-          Array.from(script.attributes).forEach(attribute => {
-            newScript.setAttribute(attribute.name, attribute.value);
-          });
-          newScript.textContent = script.textContent;
-          document.head.appendChild(newScript);
-        });
-
-        setTimeout(() => {
-          if (window.initializeMusicPlayer) {
-            window.initializeMusicPlayer();
-          } else {
-            console.error('initializeMusicPlayer function not found in loaded content.');
-          }
-        }, 100);
-      } catch (error) {
-        console.error('Fehler beim Laden der externen Seite:', error);
-        alert('Fehler beim Laden des Inhalts. Bitte versuche es später noch einmal.');
-      }
-    }
-
-    async function checkPassword() {
-      const passwordInput = document.getElementById('password');
-      const password = passwordInput.value;
-
-      if (password === 'Angelobot28') {
-        let targetUrl = '';
-        if (isMobile()) {
-          targetUrl = 'https://files-7a6.pages.dev/mobile.html';
-        } else {
-          targetUrl = 'https://files-7a6.pages.dev/index.html';
-        }
-        await loadExternalContent(targetUrl);
-      } else {
-        alert('Falsches Passwort!');
-        passwordInput.value = '';
-      }
-    }
-
-    async function checkImageGen() {
-      const passwordInput = document.getElementById('password');
-      const password = passwordInput.value;
-      // Passwort prüfen, gleiche Sicherheitsabfrage wie bei checkPassword
-      if (password === 'Angelobot28') {
-        const targetUrl = 'https://raw.githubusercontent.com/zBaraka/zBaraka.github.io/refs/heads/main/web.html';
-        await loadExternalContent(targetUrl);
-      } else {
-        alert('Falsches Passwort!');
-        passwordInput.value = '';
-      }
-    }
-
-    function isMobile() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-
-    function handleEnterKey(event) {
-      if (event.key === 'Enter') {
-        // Standardmäßig den blauen Button (Eingeben) auslösen.
-        checkPassword();
-      }
-    }
-  </script>
 </body>
 </html>
