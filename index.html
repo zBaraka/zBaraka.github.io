@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Password Base</title>
+    <title>Password Base</title> 
+    <link rel="icon" href="https://i.imgur.com/JP4qYpv.png" type="image/png">
     <style>
         body, html {
             margin: 0;
@@ -18,7 +19,21 @@
 </head>
 <body>
 
-    <iframe src="https://password-base.laveimma.workers.dev/"></iframe>
+    <iframe id="myIframe" src="https://password-base.laveimma.workers.dev/"></iframe>
+
+    <script>
+        window.addEventListener('message', function(event) {
+            // **WICHTIG: Origin-Prüfung für Sicherheit!**
+            // **ERSETZE 'https://password-base.laveimma.workers.dev' durch die ORIGIN deiner WORKER-Seite!**
+            if (event.origin !== 'https://password-base.laveimma.workers.dev') {
+                 return; // Nachricht stammt nicht von der erwarteten Quelle, ignoriere sie
+            }
+
+            if (event.data && event.data.type === 'iframe-title') {
+                document.title = event.data.title; // Aktualisiere den Titel der Hauptseite
+            }
+        });
+    </script>
 
 </body>
 </html>
