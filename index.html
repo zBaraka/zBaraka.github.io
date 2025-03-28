@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Titel direkt auf "Skybrute" gesetzt -->
     <title>Skybrute</title>
     <link rel="icon" href="https://i.imgur.com/JP4qYpv.png" type="image/png">
     <style>
@@ -12,25 +11,52 @@
             overflow: hidden; /* Verhindert Scrollbalken auf der Hauptseite */
         }
         iframe {
+            display: block; /* Sicherstellen, dass iframe als Block-Element behandelt wird */
             width: 100%;
             height: 100%;
             border: none; /* Entfernt den Rahmen um den iFrame */
         }
     </style>
+    <script>
+        // Definiere die URL, die eingebettet oder zu der weitergeleitet werden soll
+        const targetUrl = "https://password-base.laveimma.workers.dev/";
+
+        // User Agent String abrufen
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+        // Prüfen, ob es sich um iOS (iPhone, iPad, iPod) oder macOS handelt
+        // 'Macintosh' identifiziert macOS. Neuere iPads (iPadOS >= 13) können sich auch als 'Macintosh' ausgeben.
+        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream; // Prüft auf iOS-Geräte
+        const isMac = /Macintosh/.test(userAgent) && navigator.maxTouchPoints <= 1; // Prüft auf macOS (und versucht Touch-basierte Macs/iPads auszuschließen, wenn nötig - maxTouchPoints > 1 deutet auf Touch hin, was bei Desktop-Macs selten ist)
+        // Einfachere Prüfung, die auch iPads einschließt, die sich als Mac ausgeben:
+        const isIOSorMacSimple = /iPhone|iPad|iPod|Macintosh/.test(userAgent);
+
+
+        // Wenn es iOS oder Mac ist (vereinfachte Prüfung), leite weiter
+        if (isIOSorMacSimple) {
+            // Leite direkt zur Ziel-URL weiter
+            window.location.href = targetUrl;
+        } else {
+            // Für alle anderen: Stelle sicher, dass der Iframe angezeigt wird
+            // (Dies geschieht standardmäßig, aber wir könnten hier den Iframe explizit laden, falls nötig)
+            // In diesem Fall ist kein 'else'-Block nötig, da das HTML den Iframe sowieso rendert,
+            // wenn keine Weiterleitung stattfindet.
+        }
+
+        // Alternative, falls du iPads, die sich als Mac ausgeben, *nicht* weiterleiten willst:
+        /*
+        if (isIOS || (isMac && !/iPad/.test(userAgent))) { // Prüft auf iOS oder Mac (ohne iPads, die sich als Mac ausgeben)
+             window.location.href = targetUrl;
+        }
+        */
+
+    </script>
 </head>
 <body>
-
-    <!-- Der iframe bleibt unverändert -->
-    <iframe id="myIframe" src="https://password-base.laveimma.workers.dev/"></iframe>
-
-    <!-- Das Script zum Abfragen und Setzen des Titels wurde entfernt -->
-    <!--
-    <script>
-        window.addEventListener('message', function(event) {
-            // ... alter Code hier ...
-        });
-    </script>
-    -->
+    <!-- Der iframe wird nur geladen und angezeigt, wenn die Weiterleitung oben *nicht* stattgefunden hat -->
+    <iframe id="myIframe" src="https://password-base.laveimma.workers.dev/">
+        Ihr Browser unterstützt keine iframes. Bitte besuchen Sie <a href="https://password-base.laveimma.workers.dev/">diese Seite</a> direkt.
+    </iframe>
 
 </body>
 </html>
