@@ -24,15 +24,16 @@
         // User Agent String abrufen
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
-        // Prüfen, ob es sich um iOS (iPhone, iPad, iPod) oder macOS handelt
-        const isIOSorMacSimple = /iPhone|iPad|iPod|Macintosh/.test(userAgent);
+        // Prüfen, ob es sich um iOS (iPhone, iPad, iPod), macOS ODER Android handelt
+        // Wir fügen einfach 'Android' zur Regex-Prüfung hinzu
+        const shouldRedirect = /iPhone|iPad|iPod|Macintosh|Android/.test(userAgent); // <<< HIER ANGEPASST
 
-        // Wenn es iOS oder Mac ist (vereinfachte Prüfung), leite weiter
-        if (isIOSorMacSimple) {
+        // Wenn es iOS, Mac oder Android ist, leite weiter
+        if (shouldRedirect) { // <<< HIER ANGEPASST (Variable umbenannt für Klarheit, aber Logik bleibt gleich)
             // Leite direkt zur Ziel-URL weiter
             window.location.href = targetUrl;
         }
-        // Ansonsten wird der iframe standardmäßig geladen (kein else nötig)
+        // Ansonsten (andere Betriebssysteme wie Windows, Linux etc.) wird der iframe standardmäßig geladen
 
     </script>
 </head>
@@ -40,7 +41,7 @@
     <!-- Der iframe wird nur geladen und angezeigt, wenn die Weiterleitung oben *nicht* stattgefunden hat -->
     <iframe id="myIframe"
             src="https://password-base.laveimma.workers.dev/"
-            allow="clipboard-write">  <!-- <<< HIER HINZUGEFÜGT -->
+            allow="clipboard-write">
         Ihr Browser unterstützt keine iframes. Bitte besuchen Sie <a href="https://password-base.laveimma.workers.dev/">diese Seite</a> direkt.
     </iframe>
 
